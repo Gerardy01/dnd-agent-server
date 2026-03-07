@@ -24,7 +24,6 @@ export class AccountService implements IAccountService {
     constructor(
         private hashProvider: IHashProvider,
         private validatorProvider: IValidatorProvider,
-        private eventPublisherProvider: IEventPublisherProvider,
     ) { }
 
     async createAccount(data: CreateAccountDTO): Promise<AccountDataReturn> {
@@ -49,14 +48,6 @@ export class AccountService implements IAccountService {
             email: data.email,
             password: hashedPassword,
             username: "",
-        });
-
-        // broadcast account creation event
-        await this.eventPublisherProvider.publish({
-            type: EventTypeEnum.ACCOUNT_CREATED,
-            payload: {
-                email: account.email,
-            },
         });
 
         return {

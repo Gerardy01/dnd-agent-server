@@ -10,3 +10,7 @@ export type AccountDataReturn = {
     username: string;
     email: string;
 }
+
+export type LoginRegisterDataReturn = {
+    verificationToken: string;
+}

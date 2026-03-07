@@ -1,7 +1,11 @@
 import { Op } from "sequelize";
 
+// jwt
+import jwt from "jsonwebtoken";
+
 // models
 import { OtpAuth } from "@/models";
+
 
 // utils
 import { EventTypeEnum } from "@/utils/enums";
@@ -12,13 +16,16 @@ import { Forbidden } from "@/utils/exceptions";
 // interfaces
 import { GenerateOtpDTO } from "@/interfaces/IAuth"
 import { IEventPublisherProvider } from "@/provider/eventPublisherProvider";
+import { IJwtProvider } from "@/provider/jwtProvider";
 export interface IAuthService {
-    generateOtp(data: GenerateOtpDTO): Promise<void>
+    generateOtp(data: GenerateOtpDTO): Promise<void>;
+    generateVerificationToken(email: string): Promise<string>;
 }
 
 export class AuthService implements IAuthService {
     constructor(
         private eventPublisherProvider: IEventPublisherProvider,
+        private jwtProvider: IJwtProvider,
     ) { }
 
     async generateOtp(data: GenerateOtpDTO): Promise<void> {
@@ -52,8 +59,8 @@ export class AuthService implements IAuthService {
             const createdAt = existingOtp.createdAt;
             const secondsSinceCreated = (Date.now() - new Date(createdAt).getTime()) / 1000;
 
-            if (secondsSinceCreated < 30) {
-                throw new Forbidden("AUTH-002");
+            if (secondsSinceCreated < 15) {
+                throw new Forbidden("AUTH-001");
             }
 
             await existingOtp.update({ revoked: true });
@@ -75,5 +82,12 @@ export class AuthService implements IAuthService {
                 code: otp.code,
             },
         });
+    }
+
+    async generateVerificationToken(email: string): Promise<string> {
+        const secret = process.env.JWT_VERIFICATION_SECRET;
+        if (!secret) throw new Error("JWT_VERIFICATION_SECRET is not defined in environment");
+
+        return this.jwtProvider.generateVerificationToken({ email }, secret, "5m");
     }
 }

@@ -4,19 +4,19 @@ import { Request, Response } from 'express';
 import { WrongFormat, ExistData } from '@/utils/exceptions';
 
 // services
-import { accountService } from '@/services';
+import { accountOrchestration } from '@/services';
 
 class AccountController {
     static async register(req: Request, res: Response) {
 
         try {
-            const newAccount = await accountService.createAccount(req.body);
+            const data = await accountOrchestration.register(req.body);
 
             return res.status(201).json({
                 "status": "success",
-                "message": "login success",
+                "message": "Account created successfully",
                 "userMessage": "",
-                "data": newAccount,
+                "data": data
             });
 
         } catch (e) {
