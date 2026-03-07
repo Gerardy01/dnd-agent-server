@@ -21,6 +21,13 @@ export class WrongFormat extends Error {
     }
 }
 
+export class NotValid extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "NotValidError";
+    }
+}
+
 export class Forbidden extends Error {
     constructor(message: string) {
         super(message);

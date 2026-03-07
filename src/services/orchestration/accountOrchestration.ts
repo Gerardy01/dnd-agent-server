@@ -1,10 +1,10 @@
 
 // interfaces
-import { CreateAccountDTO, LoginRegisterDataReturn } from "@/interfaces/IAccount";
+import { CreateAccountDTO, RegisterDataReturn } from "@/interfaces/IAccount";
 import { IAccountService } from "../accountService";
 import { IAuthService } from "../authService";
 export interface IAccountOrchestration {
-    register(data: CreateAccountDTO): Promise<LoginRegisterDataReturn>;
+    register(data: CreateAccountDTO): Promise<RegisterDataReturn>;
 }
 
 export class AccountOrchestration implements IAccountOrchestration {
@@ -13,7 +13,7 @@ export class AccountOrchestration implements IAccountOrchestration {
         private authService: IAuthService,
     ) { }
 
-    async register(data: CreateAccountDTO): Promise<LoginRegisterDataReturn> {
+    async register(data: CreateAccountDTO): Promise<RegisterDataReturn> {
 
         // create account
         const account = await this.accountService.createAccount(data);

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 // exceptions
-import { WrongFormat, ExistData } from '@/utils/exceptions';
+import { WrongFormat, ExistData, Forbidden } from '@/utils/exceptions';
 
 // services
 import { accountOrchestration } from '@/services';
@@ -25,6 +25,14 @@ class AccountController {
                 return res.status(422).json({
                     "status": "failed",
                     "message": e.message,
+                    "userMessage": "",
+                });
+            }
+
+            if (e instanceof Forbidden) {
+                return res.status(403).json({
+                    "status": "failed",
+                    "message": "OTP cooldown",
                     "userMessage": "",
                 });
             }

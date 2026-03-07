@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 // exceptions
-import { DataNotFound, Forbidden } from '@/utils/exceptions';
+import { DataNotFound, Forbidden, NotValid } from '@/utils/exceptions';
 
 // services
 import { authOrchestration } from '@/services';
@@ -10,15 +10,34 @@ class AuthController {
     static async login(req: Request, res: Response) {
 
         try {
+
+            const data = await authOrchestration.login(req.body);
+
             return res.status(200).json({
                 "status": "success",
                 "message": "login success",
                 "userMessage": "",
-                "data": {
-                    "accessToken": ""
-                },
+                "data": data,
             });
+
         } catch (e) {
+
+            if (e instanceof DataNotFound) {
+                return res.status(404).json({
+                    "status": "failed",
+                    "message": "Account not found",
+                    "userMessage": e.message,
+                });
+            }
+
+            if (e instanceof Forbidden) {
+                return res.status(403).json({
+                    "status": "failed",
+                    "message": "OTP cooldown",
+                    "userMessage": "",
+                });
+            }
+
             return res.status(500).json({
                 "status": "failed",
                 "message": "Internal server error",
@@ -45,7 +64,7 @@ class AuthController {
                 return res.status(404).json({
                     "status": "failed",
                     "message": "Account not found",
-                    "userMessage": e.message,
+                    "userMessage": "",
                 });
             }
 
@@ -53,6 +72,62 @@ class AuthController {
                 return res.status(403).json({
                     "status": "failed",
                     "message": "OTP cooldown",
+                    "userMessage": e.message,
+                });
+            }
+
+            return res.status(500).json({
+                "status": "failed",
+                "message": "Internal server error",
+                "userMessage": "500",
+                "errors": e
+            });
+        }
+    }
+
+    static async otpVerification(req: Request, res: Response) {
+
+        try {
+            const result = await authOrchestration.otpVerification(req.body);
+
+            res.cookie('refreshToken', result.refreshToken, {
+                httpOnly: true,
+                secure: true,
+                maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days in milliseconds (following token expiry time)
+                sameSite: 'none'
+            });
+
+            return res.status(200).json({
+                "status": "success",
+                "message": "otp verification success",
+                "userMessage": "",
+                "data": {
+                    "accessToken": result.accessToken,
+                },
+            });
+
+        } catch (e) {
+
+            if (e instanceof DataNotFound) {
+                return res.status(404).json({
+                    "status": "failed",
+                    "message": "Account not found",
+                    "userMessage": "",
+                });
+            }
+
+            if (e instanceof NotValid) {
+                return res.status(401).json({
+                    "status": "failed",
+                    "message": "Token not valid",
+                    "userMessage": "",
+                });
+            }
+
+            if (e instanceof Forbidden) {
+                return res.status(403).json({
+                    "status": "failed",
+                    "message": "OTP not found",
                     "userMessage": e.message,
                 });
             }

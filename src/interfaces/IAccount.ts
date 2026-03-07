@@ -5,12 +5,17 @@ export interface CreateAccountDTO {
     password: string;
 }
 
+export interface GetAccountByCredentialsDTO {
+    identifier: string;
+    password: string;
+}
+
 export type AccountDataReturn = {
     accountId: string;
     username: string;
     email: string;
 }
 
-export type LoginRegisterDataReturn = {
+export type RegisterDataReturn = {
     verificationToken: string;
 }

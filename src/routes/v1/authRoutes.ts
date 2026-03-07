@@ -4,18 +4,27 @@ import { Router } from 'express';
 import { validateRequest } from '@/utils/middleware';
 
 // schema
-import { GenerateOtpSchema } from '@/schema/authSchema';
+import { GenerateOtpSchema, LoginSchema, VerifyOtpSchema } from '@/schema/authSchema';
 
 // controller
 import AuthController from '@/controller/authController';
 
 const authRoutes = Router();
 
-authRoutes.post('/login', AuthController.login);
+authRoutes.post(
+    '/login',
+    validateRequest(LoginSchema),
+    AuthController.login
+);
 authRoutes.post(
     '/generate-otp',
     validateRequest(GenerateOtpSchema),
     AuthController.generateOtp
 );
+authRoutes.post(
+    '/verify-otp',
+    validateRequest(VerifyOtpSchema),
+    AuthController.otpVerification
+)
 
 export default authRoutes;
