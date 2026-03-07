@@ -11,6 +11,10 @@ import AuthController from '@/controller/authController';
 
 const authRoutes = Router();
 
+authRoutes.get(
+    '/access-token',
+    AuthController.getNewAccessToken,
+);
 authRoutes.post(
     '/login',
     validateRequest(LoginSchema),

@@ -15,7 +15,8 @@ import { IHashProvider } from "@/provider/hashProvider";
 import { IValidatorProvider } from "@/provider/validatorProvider";
 export interface IAccountService {
     createAccount(data: CreateAccountDTO): Promise<AccountDataReturn>;
-    getAccountByEmail(email: string): Promise<AccountDataReturn | null>;
+    getAccountByEmail(email: string): Promise<AccountDataReturn>;
+    getAccountById(accountId: string): Promise<AccountDataReturn>;
     getAccountByCredentials(data: GetAccountByCredentialsDTO): Promise<AccountDataReturn>;
 }
 
@@ -58,9 +59,25 @@ export class AccountService implements IAccountService {
         };
     }
 
-    async getAccountByEmail(email: string): Promise<AccountDataReturn | null> {
+    async getAccountByEmail(email: string): Promise<AccountDataReturn> {
         const account = await Account.findOne({ where: { email, archived: false } });
-        if (!account) return null;
+        if (!account) {
+            throw new DataNotFound("Account not exist");
+        }
+
+        return {
+            accountId: account.account_id,
+            username: account.username,
+            email: account.email,
+        }
+    }
+
+    async getAccountById(accountId: string): Promise<AccountDataReturn> {
+        const account = await Account.findOne({ where: { account_id: accountId, archived: false } });
+        if (!account) {
+            throw new DataNotFound("Account not exist");
+        }
+
         return {
             accountId: account.account_id,
             username: account.username,

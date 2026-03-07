@@ -34,3 +34,10 @@ export type VerifyOtpReturn = {
 export type LoginDataReturn = {
     verificationToken: string;
 }
+
+export type RefreshSessionReturn = {
+    id: number;
+    accountId: string;
+    tokenExpiry: Date;
+    identifier: string;
+}

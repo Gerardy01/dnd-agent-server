@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 
-
 // interfaces
 export interface IHashProvider {
     hashString(string: string, saltRounds?: number): Promise<string>;

@@ -10,6 +10,7 @@ export interface IAuthOrchestration {
     generateNewOtp(email: string): Promise<void>;
     otpVerification(data: VerifyOtpDTO): Promise<VerifyOtpReturn>;
     login(data: LoginDTO): Promise<LoginDataReturn>;
+    getNewAccessToken(identifier: string): Promise<string>;
 }
 
 export class AuthOrchestration implements IAuthOrchestration {
@@ -22,13 +23,10 @@ export class AuthOrchestration implements IAuthOrchestration {
 
         // check if account exist
         const account = await this.accountService.getAccountByEmail(email);
-        if (!account) {
-            throw new DataNotFound("Account not exist");
-        }
 
         // generate otp
         await this.authService.generateOtp({
-            address: email,
+            address: account.email,
         });
     }
 
@@ -39,9 +37,6 @@ export class AuthOrchestration implements IAuthOrchestration {
 
         // get account data
         const account = await this.accountService.getAccountByEmail(email);
-        if (!account) {
-            throw new DataNotFound("Account not exist");
-        }
 
         // generate access token
         const accessToken = await this.authService.generateAccessToken({
@@ -51,8 +46,7 @@ export class AuthOrchestration implements IAuthOrchestration {
         });
 
         // generate refresh token
-        const refreshToken = await this.authService.generateRefreshToken();
-
+        const refreshToken = await this.authService.generateRefreshToken(account.accountId);
 
         return {
             accessToken,
@@ -74,5 +68,23 @@ export class AuthOrchestration implements IAuthOrchestration {
         return {
             verificationToken,
         }
+    }
+
+    async getNewAccessToken(identifier: string): Promise<string> {
+
+        // get valid refresh token
+        const refreshSession = await this.authService.getVaildRefreshSession(identifier);
+
+        // get account data
+        const account = await this.accountService.getAccountById(refreshSession.accountId);
+
+        // generate new access token
+        const accessToken = await this.authService.generateAccessToken({
+            accountId: account.accountId,
+            username: account.username,
+            email: account.email,
+        });
+
+        return accessToken;
     }
 }

@@ -1,7 +1,8 @@
-import { Op } from "sequelize";
+import { Op, Transaction } from "sequelize";
+import crypto from "crypto";
 
 // models
-import { OtpAuth } from "@/models";
+import { OtpAuth, RefreshToken } from "@/models";
 
 
 // utils
@@ -11,21 +12,24 @@ import { EventTypeEnum } from "@/utils/enums";
 import { Forbidden, NotValid } from "@/utils/exceptions";
 
 // interfaces
-import { GenerateAccessTokenDTO, GenerateOtpDTO, VerifyOtpDTO } from "@/interfaces/IAuth"
+import { GenerateAccessTokenDTO, GenerateOtpDTO, RefreshSessionReturn, VerifyOtpDTO } from "@/interfaces/IAuth"
 import { IEventPublisherProvider } from "@/provider/eventPublisherProvider";
 import { IJwtProvider } from "@/provider/jwtProvider";
+import { ICryptProvider } from "@/provider/cryptProvider";
 export interface IAuthService {
     generateOtp(data: GenerateOtpDTO, skipColldown?: boolean): Promise<void>;
     generateVerificationToken(email: string): Promise<string>;
     verifyOtp(data: VerifyOtpDTO): Promise<string>;
     generateAccessToken(data: GenerateAccessTokenDTO): Promise<string>;
-    generateRefreshToken(): Promise<string>;
+    generateRefreshToken(accountId: string): Promise<string>;
+    getVaildRefreshSession(identifier: string): Promise<RefreshSessionReturn>;
 }
 
 export class AuthService implements IAuthService {
     constructor(
         private eventPublisherProvider: IEventPublisherProvider,
         private jwtProvider: IJwtProvider,
+        private cryptProvider: ICryptProvider,
     ) { }
 
     async generateOtp(data: GenerateOtpDTO, skipColldown = false): Promise<void> {
@@ -129,7 +133,67 @@ export class AuthService implements IAuthService {
         }, secret, "15m");
     }
 
-    async generateRefreshToken(): Promise<string> {
-        return "";
+    async generateRefreshToken(accountId: string): Promise<string> {
+
+        // check and revoke session if >= 3 active sessions detected
+        await this.checkAndRevokeSession(accountId, 3);
+
+        // generate a cryptographically secure random identifier
+        const identifier = this.cryptProvider.generateRandomString();
+
+        // resolve expiry from env (in days) or fall back to 7 days
+        const tokenExpiryDate = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
+
+        await RefreshToken.create({
+            account_id: accountId,
+            identifier,
+            token_expiry_date: tokenExpiryDate,
+            user_agent: "",
+            is_revoked: false,
+        });
+
+        return identifier;
+    }
+
+    async getVaildRefreshSession(identifier: string): Promise<RefreshSessionReturn> {
+
+        const refreshSession = await RefreshToken.findOne({
+            where: {
+                identifier: identifier,
+                is_revoked: false,
+                token_expiry_date: { [Op.gt]: new Date() },
+            },
+        });
+
+        if (!refreshSession) {
+            throw new NotValid("Refresh token is not valid");
+        }
+
+        return {
+            id: refreshSession.id,
+            accountId: refreshSession.account_id,
+            tokenExpiry: refreshSession.token_expiry_date,
+            identifier: refreshSession.identifier,
+        }
+    }
+
+    private async checkAndRevokeSession(accountId: string, cap: number = 3, transaction?: Transaction): Promise<void> {
+
+        const sessionList = await RefreshToken.findAll({
+            where: {
+                account_id: accountId,
+                is_revoked: false,
+                token_expiry_date: { [Op.gt]: new Date() },
+            },
+            order: [['created_at', 'ASC']]
+        });
+
+        if (sessionList.length < cap) return;
+
+        const oldestSession = sessionList[0];
+        if (!oldestSession) return;
+
+        oldestSession.is_revoked = true;
+        await oldestSession.save({ transaction: transaction ?? null });
     }
 }
