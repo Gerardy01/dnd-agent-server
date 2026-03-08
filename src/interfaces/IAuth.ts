@@ -41,3 +41,9 @@ export type RefreshSessionReturn = {
     tokenExpiry: Date;
     identifier: string;
 }
+
+export type AccessTokenBody = {
+    accountId: string;
+    username: string;
+    email: string;
+}

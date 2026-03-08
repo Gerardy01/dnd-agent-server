@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import { Transaction } from 'sequelize';
+import sequelize from '@/config/database';
 
 // exceptions
 import { DataNotFound, Forbidden, NotValid } from '@/utils/exceptions';
@@ -87,10 +89,13 @@ class AuthController {
     }
 
     static async otpVerification(req: Request, res: Response) {
+        const transaction: Transaction = await sequelize.transaction();
 
         try {
 
-            const result = await authOrchestration.otpVerification(req.body);
+            const result = await authOrchestration.otpVerification(req.body, transaction);
+
+            transaction.commit();
 
             res.cookie('refreshToken', result.refreshToken, {
                 httpOnly: true,
@@ -109,6 +114,8 @@ class AuthController {
             });
 
         } catch (e) {
+
+            transaction.rollback();
 
             if (e instanceof DataNotFound) {
                 return res.status(404).json({

@@ -19,7 +19,7 @@ export class AccountOrchestration implements IAccountOrchestration {
         const account = await this.accountService.createAccount(data);
 
         // generate OTP
-        await this.authService.generateOtp({ address: account.email });
+        await this.authService.generateOtp({ address: account.email }, true);
 
         // generate verification token
         const verificationToken = await this.authService.generateVerificationToken(account.email);

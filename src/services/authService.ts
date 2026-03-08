@@ -1,5 +1,4 @@
 import { Op, Transaction } from "sequelize";
-import crypto from "crypto";
 
 // models
 import { OtpAuth, RefreshToken } from "@/models";
@@ -12,7 +11,7 @@ import { EventTypeEnum } from "@/utils/enums";
 import { Forbidden, NotValid } from "@/utils/exceptions";
 
 // interfaces
-import { GenerateAccessTokenDTO, GenerateOtpDTO, RefreshSessionReturn, VerifyOtpDTO } from "@/interfaces/IAuth"
+import { AccessTokenBody, GenerateAccessTokenDTO, GenerateOtpDTO, RefreshSessionReturn, VerifyOtpDTO } from "@/interfaces/IAuth"
 import { IEventPublisherProvider } from "@/provider/eventPublisherProvider";
 import { IJwtProvider } from "@/provider/jwtProvider";
 import { ICryptProvider } from "@/provider/cryptProvider";
@@ -21,8 +20,9 @@ export interface IAuthService {
     generateVerificationToken(email: string): Promise<string>;
     verifyOtp(data: VerifyOtpDTO): Promise<string>;
     generateAccessToken(data: GenerateAccessTokenDTO): Promise<string>;
-    generateRefreshToken(accountId: string): Promise<string>;
+    generateRefreshToken(accountId: string, transaction?: Transaction): Promise<string>;
     getVaildRefreshSession(identifier: string): Promise<RefreshSessionReturn>;
+    verifyAccessToken(accessToken: string): Promise<AccessTokenBody>;
 }
 
 export class AuthService implements IAuthService {
@@ -133,10 +133,10 @@ export class AuthService implements IAuthService {
         }, secret, "15m");
     }
 
-    async generateRefreshToken(accountId: string): Promise<string> {
+    async generateRefreshToken(accountId: string, transaction?: Transaction): Promise<string> {
 
         // check and revoke session if >= 3 active sessions detected
-        await this.checkAndRevokeSession(accountId, 3);
+        await this.checkAndRevokeSession(accountId, 3, transaction);
 
         // generate a cryptographically secure random identifier
         const identifier = this.cryptProvider.generateRandomString();
@@ -150,7 +150,7 @@ export class AuthService implements IAuthService {
             token_expiry_date: tokenExpiryDate,
             user_agent: "",
             is_revoked: false,
-        });
+        }, { transaction: transaction ?? null });
 
         return identifier;
     }
@@ -175,6 +175,16 @@ export class AuthService implements IAuthService {
             tokenExpiry: refreshSession.token_expiry_date,
             identifier: refreshSession.identifier,
         }
+    }
+
+    async verifyAccessToken(accessToken: string): Promise<AccessTokenBody> {
+        const secret = process.env.JWT_VERIFICATION_SECRET;
+        if (!secret) throw new Error("JWT_VERIFICATION_SECRET is not defined in environment");
+
+        const decoded = await this.jwtProvider.validateToken(accessToken, secret);
+        if (!decoded) throw new NotValid("Access token is not valid");
+
+        return decoded;
     }
 
     private async checkAndRevokeSession(accountId: string, cap: number = 3, transaction?: Transaction): Promise<void> {

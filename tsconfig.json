@@ -34,6 +34,9 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
+  "files": [
+    "src/config/index.d.ts"
+  ],
   "include": [
     "src/**/*"
   ],

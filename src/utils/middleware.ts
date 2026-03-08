@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 
+// services
+import { authService } from '@/services';
+
 // interfaces
 interface IZodErrorMessage {
     field: string;
@@ -33,4 +36,30 @@ export function validateRequest(Schema: any) {
 
         next();
     }
+}
+
+export async function authenticate(req: Request, res: Response, next: NextFunction) {
+
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({
+            "status": "failed",
+            "message": "bad request, not authenticated",
+            "userMessage": "",
+        });
+    }
+
+    try {
+        const tokenData = await authService.verifyAccessToken(token);
+        req.user = tokenData;
+
+        next();
+    } catch (e) {
+        return res.status(401).json({
+            "status": "failed",
+            "message": "bad request, not authenticated",
+            "userMessage": "",
+        });
+    }
+
 }
