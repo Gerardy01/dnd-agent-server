@@ -12,7 +12,7 @@ import AuthController from '@/controller/authController';
 const authRoutes = Router();
 
 authRoutes.get(
-    '/access-token',
+    '/token',
     AuthController.getNewAccessToken,
 );
 authRoutes.post(

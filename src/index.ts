@@ -16,7 +16,7 @@ const host: string = process.env.HOST || '0.0.0.0';
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: ["*"], // add another url to allow more
+    origin: ["http://localhost:5173", "*"], // add another url to allow more
     credentials: true,
 }));
 
