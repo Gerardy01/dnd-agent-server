@@ -29,14 +29,6 @@ class AccountController {
                 });
             }
 
-            if (e instanceof Forbidden) {
-                return res.status(403).json({
-                    "status": "failed",
-                    "message": "OTP cooldown",
-                    "userMessage": "",
-                });
-            }
-
             if (e instanceof ExistData) {
                 return res.status(409).json({
                     "status": "failed",

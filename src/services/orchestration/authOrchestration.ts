@@ -1,4 +1,4 @@
-import { Transaction } from "sequelize";
+import sequelize from '@/config/database';
 
 // interfaces
 import { IAccountService } from "@/services/accountService";
@@ -6,7 +6,7 @@ import { IAuthService } from "@/services/authService";
 import { LoginDataReturn, LoginDTO, VerifyOtpDTO, VerifyOtpReturn } from "@/interfaces/IAuth";
 export interface IAuthOrchestration {
     generateNewOtp(email: string): Promise<void>;
-    otpVerification(data: VerifyOtpDTO, transaction?: Transaction): Promise<VerifyOtpReturn>;
+    otpVerification(data: VerifyOtpDTO): Promise<VerifyOtpReturn>;
     login(data: LoginDTO): Promise<LoginDataReturn>;
     getNewAccessToken(identifier: string): Promise<string>;
 }
@@ -28,27 +28,36 @@ export class AuthOrchestration implements IAuthOrchestration {
         });
     }
 
-    async otpVerification(data: VerifyOtpDTO, transaction?: Transaction): Promise<VerifyOtpReturn> {
+    async otpVerification(data: VerifyOtpDTO): Promise<VerifyOtpReturn> {
+        const transaction = await sequelize.transaction();
 
-        // verify otp
-        const email = await this.authService.verifyOtp(data);
+        try {
+            // verify otp
+            const email = await this.authService.verifyOtp(data);
 
-        // get account data
-        const account = await this.accountService.getAccountByEmail(email);
+            // get account data
+            const account = await this.accountService.getAccountByEmail(email);
 
-        // generate access token
-        const accessToken = await this.authService.generateAccessToken({
-            accountId: account.accountId,
-            username: account.username,
-            email: account.email,
-        });
+            // generate access token
+            const accessToken = await this.authService.generateAccessToken({
+                accountId: account.accountId,
+                username: account.username,
+                email: account.email,
+            });
 
-        // generate refresh token
-        const refreshToken = await this.authService.generateRefreshToken(account.accountId, transaction);
+            // generate refresh token
+            const refreshToken = await this.authService.generateRefreshToken(account.accountId, transaction);
 
-        return {
-            accessToken,
-            refreshToken,
+            await transaction.commit();
+
+            return {
+                accessToken,
+                refreshToken,
+            }
+
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
         }
     }
 
