@@ -30,14 +30,6 @@ class AuthController {
                 });
             }
 
-            if (e instanceof Forbidden) {
-                return res.status(403).json({
-                    "status": "failed",
-                    "message": "OTP cooldown",
-                    "userMessage": "",
-                });
-            }
-
             return res.status(500).json({
                 "status": "failed",
                 "message": "Internal server error",
