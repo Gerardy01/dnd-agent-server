@@ -46,6 +46,7 @@ export const authOrchestration = new AuthOrchestration(
 export const accountOrchestration = new AccountOrchestration(
     accountService,
     authService,
+    notificationService,
 );
 export const notificationOrchestration = new NotificationOrchestration(
     notificationService,

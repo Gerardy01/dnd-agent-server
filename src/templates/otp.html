@@ -1,29 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <title>Email OTP</title>
 </head>
-
-<body
-    style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 15px;">
-    <h2 style="color: #4285f4; text-align: center;">Email OTP</h2>
-    <hr />
-    <p>Dear User,</p>
-    <p>Your One-Time Password (OTP) is:</p>
-    <h1 style="color: #4285f4; text-align: center;">
-        <%= otp %>
-    </h1>
-    <p>
-        Please use this OTP to complete your login process. Do not share this
-        code with anyone.
-    </p>
-    <p>Thank you for using Email OTP!</p>
-    <p style="font-size: 12px; text-align: center; color: #888;">
-        &copy;
-        <a href="<%= host %>" style="color: #888;">my web link later</a>. All rights reserved.
-    </p>
+<body style="font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; background-color: #EAE3D2; padding: 20px; text-align: center; color: #333333; margin: 0;">
+    <div style="max-width: 500px; margin: 0 auto; background-color: #F5F1E7; padding: 40px 32px; border-radius: 16px; border: 1px solid #C2BAA6; box-shadow: 0 10px 25px -5px rgba(62, 74, 61, 0.15);">
+        <h2 style="color: #333; font-size: 24px; margin-top: 0; margin-bottom: 20px;">Your Access Scroll</h2>
+        <hr style="border: none; border-top: 1px dashed #C2BAA6; margin-bottom: 24px;" />
+        <p style="font-size: 16px; margin: 0 0 16px 0;">Greetings Adventurer,</p>
+        <p style="font-size: 16px; margin: 0 0 16px 0;">Your magical incantation (OTP) to enter the realm is:</p>
+        
+        <h1 style="color: #D95C14; text-align: center; font-size: 48px; letter-spacing: 6px; margin: 32px 0;">
+            <%= otp %>
+        </h1>
+        
+        <p style="font-size: 14px; color: #555; line-height: 1.5; margin: 0 0 16px 0;">
+            Please use this incantation to complete your login process. Do not share this
+            code with anyone, lest they steal your identity in the realm.
+        </p>
+        
+        <p style="font-size: 14px; margin: 0;">Safe travels!</p>
+        <p style="font-size: 12px; text-align: center; color: #888; margin-top: 40px;">
+            &copy;
+            <a href="<%= host %>" style="color: #888;">DnD Agent</a>. All rights reserved.
+        </p>
+    </div>
 </body>
-
 </html>

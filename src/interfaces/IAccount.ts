@@ -10,6 +10,10 @@ export interface GetAccountByCredentialsDTO {
     password: string;
 }
 
+export interface ForgotPasswordRequestDTO {
+    email: string;
+}
+
 export type AccountDataReturn = {
     accountId: string;
     username: string;
