@@ -3,14 +3,11 @@
 import { Account } from "@/models";
 import { Op } from "sequelize";
 
-// utils
-import { EventTypeEnum } from "@/utils/enums";
-
 // exceptions
-import { ExistData, WrongFormat, DataNotFound, NotValid } from "@/utils/exceptions";
+import { ExistData, WrongFormat, DataNotFound } from "@/utils/exceptions";
 
 // interfaces
-import { AccountDataReturn, CreateAccountDTO, GetAccountByCredentialsDTO } from "@/interfaces/IAccount";
+import { AccountDataReturn, CreateAccountDTO, GetAccountByCredentialsDTO, ResetPasswordServiceDTO } from "@/interfaces/IAccount";
 import { IHashProvider } from "@/provider/hashProvider";
 import { IValidatorProvider } from "@/provider/validatorProvider";
 export interface IAccountService {
@@ -18,6 +15,7 @@ export interface IAccountService {
     getAccountByEmail(email: string): Promise<AccountDataReturn>;
     getAccountById(accountId: string): Promise<AccountDataReturn>;
     getAccountByCredentials(data: GetAccountByCredentialsDTO): Promise<AccountDataReturn>;
+    resetPassword(data: ResetPasswordServiceDTO): Promise<void>;
 }
 
 
@@ -61,14 +59,13 @@ export class AccountService implements IAccountService {
 
     async getAccountByEmail(email: string): Promise<AccountDataReturn> {
         const account = await Account.findOne({ where: { email, archived: false } });
-        if (!account) {
-            throw new DataNotFound("Account not exist");
-        }
+        if (!account) throw new DataNotFound("Account not exist");
 
         return {
             accountId: account.account_id,
             username: account.username,
             email: account.email,
+            password: account.password,
         }
     }
 
@@ -108,5 +105,20 @@ export class AccountService implements IAccountService {
             username: account.username,
             email: account.email,
         };
+    }
+
+    async resetPassword(data: ResetPasswordServiceDTO): Promise<void> {
+        const account = await Account.findOne({
+            where: {
+                email: data.email,
+                archived: false,
+                password: data.key,
+            }
+        });
+        if (!account) throw new DataNotFound("Account not exist");
+
+        const hashedPassword = await this.hashProvider.hashString(data.newPassword);
+
+        await account.update({ password: hashedPassword });
     }
 }

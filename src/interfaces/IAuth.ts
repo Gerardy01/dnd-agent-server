@@ -16,6 +16,11 @@ export interface GenerateVerificationTokenDTO {
     email: string;
 }
 
+export interface GenerateResetPassTokenDTO {
+    email: string;
+    key: string;
+}
+
 export interface VerifyOtpDTO {
     token: string;
     code: number;
@@ -40,6 +45,11 @@ export type RefreshSessionReturn = {
     accountId: string;
     tokenExpiry: Date;
     identifier: string;
+}
+
+export type VerifyResetPassTokenReturn = {
+    email: string;
+    key: string;
 }
 
 export type AccessTokenBody = {

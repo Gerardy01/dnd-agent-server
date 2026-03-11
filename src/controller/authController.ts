@@ -49,6 +49,7 @@ class AuthController {
                 "status": "success",
                 "message": "generate otp success",
                 "userMessage": "",
+                "data": true,
             });
 
         } catch (e) {

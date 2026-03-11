@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 // exceptions
-import { WrongFormat, ExistData, Forbidden, DataNotFound } from '@/utils/exceptions';
+import { WrongFormat, ExistData, DataNotFound, NotValid } from '@/utils/exceptions';
 
 // services
 import { accountOrchestration } from '@/services';
@@ -64,6 +64,45 @@ class AccountController {
                 return res.status(404).json({
                     "status": "failed",
                     "message": e.message,
+                    "userMessage": "",
+                });
+            }
+
+            return res.status(500).json({
+                "status": "failed",
+                "message": "Internal server error",
+                "userMessage": "500",
+                "errors": e
+            });
+        }
+    }
+
+    static async resetPassword(req: Request, res: Response) {
+        try {
+
+            await accountOrchestration.resetPassword(req.body);
+
+            return res.status(200).json({
+                "status": "success",
+                "message": "Password reset successfully",
+                "userMessage": "",
+                "data": true,
+            });
+
+        } catch (e) {
+
+            if (e instanceof DataNotFound) {
+                return res.status(404).json({
+                    "status": "failed",
+                    "message": e.message,
+                    "userMessage": "",
+                });
+            }
+
+            if (e instanceof NotValid) {
+                return res.status(401).json({
+                    "status": "failed",
+                    "message": "Token not valid",
                     "userMessage": "",
                 });
             }
