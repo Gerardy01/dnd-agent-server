@@ -11,7 +11,7 @@ import { EventTypeEnum } from "@/utils/enums";
 import { Forbidden, NotValid } from "@/utils/exceptions";
 
 // interfaces
-import { AccessTokenBody, GenerateAccessTokenDTO, GenerateOtpDTO, GenerateResetPassTokenDTO, RefreshSessionReturn, VerifyOtpDTO, VerifyResetPassTokenReturn } from "@/interfaces/IAuth"
+import { AccessTokenBody, GenerateAccessTokenDTO, GenerateOtpDTO, GenerateResetPassTokenDTO, GenerateVerificationTokenDTO, RefreshSessionReturn, VerifyOtpDTO, VerifyResetPassTokenReturn } from "@/interfaces/IAuth"
 import { IEventPublisherProvider } from "@/provider/eventPublisherProvider";
 import { IJwtProvider } from "@/provider/jwtProvider";
 import { ICryptProvider } from "@/provider/cryptProvider";
@@ -98,14 +98,14 @@ export class AuthService implements IAuthService {
         const secret = process.env.JWT_VERIFICATION_SECRET;
         if (!secret) throw new Error("JWT_VERIFICATION_SECRET is not defined in environment");
 
-        return this.jwtProvider.generateVerificationToken({ email }, secret, "5m");
+        return this.jwtProvider.generateToken<GenerateVerificationTokenDTO>({ email }, secret, "5m");
     }
 
     async verifyOtp(data: VerifyOtpDTO): Promise<string> {
         const secret = process.env.JWT_VERIFICATION_SECRET;
         if (!secret) throw new Error("JWT_VERIFICATION_SECRET is not defined in environment");
 
-        const decoded = await this.jwtProvider.validateToken(data.token, secret);
+        const decoded = await this.jwtProvider.validateToken<GenerateVerificationTokenDTO>(data.token, secret);
         if (!decoded) throw new NotValid("Token not valid");
 
         const otp = await OtpAuth.findOne({
@@ -128,14 +128,14 @@ export class AuthService implements IAuthService {
         const secret = process.env.JWT_VERIFICATION_SECRET;
         if (!secret) throw new Error("JWT_VERIFICATION_SECRET is not defined in environment");
 
-        return this.jwtProvider.generateResetPassToken(data, secret, "5m");
+        return this.jwtProvider.generateToken<GenerateResetPassTokenDTO>(data, secret, "5m");
     }
 
     async generateAccessToken(data: GenerateAccessTokenDTO): Promise<string> {
         const secret = process.env.JWT_VERIFICATION_SECRET;
         if (!secret) throw new Error("JWT_ACCESS_SECRET is not defined in environment");
 
-        return this.jwtProvider.generateAccessToken({
+        return this.jwtProvider.generateToken<GenerateAccessTokenDTO>({
             email: data.email,
             accountId: data.accountId,
             username: data.username,
@@ -190,7 +190,7 @@ export class AuthService implements IAuthService {
         const secret = process.env.JWT_VERIFICATION_SECRET;
         if (!secret) throw new Error("JWT_VERIFICATION_SECRET is not defined in environment");
 
-        const decoded = await this.jwtProvider.validateToken(accessToken, secret);
+        const decoded = await this.jwtProvider.validateToken<AccessTokenBody>(accessToken, secret);
         if (!decoded) throw new NotValid("Access token is not valid");
 
         return decoded;
@@ -200,7 +200,7 @@ export class AuthService implements IAuthService {
         const secret = process.env.JWT_VERIFICATION_SECRET;
         if (!secret) throw new Error("JWT_VERIFICATION_SECRET is not defined in environment");
 
-        const decoded = await this.jwtProvider.validateToken(token, secret);
+        const decoded = await this.jwtProvider.validateToken<GenerateResetPassTokenDTO>(token, secret);
         if (!decoded) throw new NotValid("Token not valid");
 
         return decoded;

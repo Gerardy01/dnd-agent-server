@@ -3,29 +3,23 @@ import jwt, { SignOptions } from "jsonwebtoken";
 // types
 import { GenerateAccessTokenDTO, GenerateResetPassTokenDTO, GenerateVerificationTokenDTO } from "@/interfaces/IAuth";
 export interface IJwtProvider {
-    generateVerificationToken(payload: GenerateVerificationTokenDTO, secret: string, expiresIn: NonNullable<SignOptions['expiresIn']>): Promise<string>;
-    generateAccessToken(payload: GenerateAccessTokenDTO, secret: string, expiresIn: NonNullable<SignOptions['expiresIn']>): Promise<string>;
-    generateResetPassToken(payload: GenerateResetPassTokenDTO, secret: string, expiresIn: NonNullable<SignOptions['expiresIn']>): Promise<string>;
-    validateToken(token: string, secret: string): Promise<any>;
+    generateToken<T extends object>(payload: T, secret: string, expiresIn: NonNullable<SignOptions['expiresIn']>): Promise<string>;
+    validateToken<T>(token: string, secret: string): Promise<T | null>;
 }
 
 export class JwtProvider implements IJwtProvider {
-    async generateVerificationToken(payload: GenerateVerificationTokenDTO, secret: string, expiresIn: NonNullable<SignOptions['expiresIn']>): Promise<string> {
-        return jwt.sign(payload, secret, { expiresIn: expiresIn });
+    async generateToken<T extends object>(
+        payload: T,
+        secret: string,
+        expiresIn: NonNullable<SignOptions['expiresIn']>
+    ): Promise<string> {
+        return jwt.sign(payload, secret, { expiresIn });
     }
 
-    async generateAccessToken(payload: GenerateAccessTokenDTO, secret: string, expiresIn: NonNullable<SignOptions["expiresIn"]>): Promise<string> {
-        return jwt.sign(payload, secret, { expiresIn: expiresIn });
-    }
-
-    async generateResetPassToken(payload: GenerateResetPassTokenDTO, secret: string, expiresIn: NonNullable<SignOptions['expiresIn']>): Promise<string> {
-        return jwt.sign(payload, secret, { expiresIn: expiresIn });
-    }
-
-    async validateToken(token: string, secret: string): Promise<any> {
+    async validateToken<T>(token: string, secret: string): Promise<T | null> {
         try {
             const decoded = jwt.verify(token, secret);
-            return decoded;
+            return decoded as T;
         } catch (e) {
             return null;
         }
