@@ -3,11 +3,6 @@ import { AccountService } from "@/services/accountService";
 import { AuthService } from "@/services/authService";
 import { NotificationService } from "@/services/notificationService";
 
-// orchestration
-import { AuthOrchestration } from "@/services/orchestration/authOrchestration";
-import { AccountOrchestration } from "@/services/orchestration/accountOrchestration";
-import { NotificationOrchestration } from "@/services/orchestration/notificationOrchestration";
-
 // providers
 import { BcryptHashProvider } from "@/provider/hashProvider";
 import { ValidatorValidatorProvider } from "@/provider/validatorProvider";
@@ -36,19 +31,4 @@ export const authService = new AuthService(
 );
 export const notificationService = new NotificationService(
     nodeMailerEmailProvider,
-);
-
-// orchestration init
-export const authOrchestration = new AuthOrchestration(
-    authService,
-    accountService,
-);
-export const accountOrchestration = new AccountOrchestration(
-    accountService,
-    authService,
-    notificationService,
-);
-export const notificationOrchestration = new NotificationOrchestration(
-    notificationService,
-    inMemoryEventPublisher,
 );

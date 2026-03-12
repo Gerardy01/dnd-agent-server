@@ -7,7 +7,7 @@ import { Op } from "sequelize";
 import { ExistData, WrongFormat, DataNotFound } from "@/utils/exceptions";
 
 // interfaces
-import { AccountDataReturn, CreateAccountDTO, GetAccountByCredentialsDTO, ResetPasswordServiceDTO } from "@/interfaces/IAccount";
+import { AccountDataReturn, ChangeUsernameDTO, CreateAccountDTO, GetAccountByCredentialsDTO, ResetPasswordServiceDTO } from "@/interfaces/IAccount";
 import { IHashProvider } from "@/provider/hashProvider";
 import { IValidatorProvider } from "@/provider/validatorProvider";
 export interface IAccountService {
@@ -16,6 +16,7 @@ export interface IAccountService {
     getAccountById(accountId: string): Promise<AccountDataReturn>;
     getAccountByCredentials(data: GetAccountByCredentialsDTO): Promise<AccountDataReturn>;
     resetPassword(data: ResetPasswordServiceDTO): Promise<void>;
+    changeUsername(data: ChangeUsernameDTO): Promise<AccountDataReturn>;
 }
 
 
@@ -120,5 +121,36 @@ export class AccountService implements IAccountService {
         const hashedPassword = await this.hashProvider.hashString(data.newPassword);
 
         await account.update({ password: hashedPassword });
+    }
+
+    async changeUsername(data: ChangeUsernameDTO): Promise<AccountDataReturn> {
+
+        // Get account
+        const account = await Account.findOne({
+            where: {
+                account_id: data.accountId,
+                archived: false,
+            }
+        });
+        if (!account) throw new DataNotFound("Account not exist");
+
+        // check username exist
+        const existingUsername = await Account.findOne({
+            where: {
+                username: data.username,
+                archived: false,
+            }
+        });
+        if (existingUsername && existingUsername.account_id !== account.account_id) {
+            throw new ExistData("ACCOUNT003");
+        }
+
+        await account.update({ username: data.username });
+
+        return {
+            accountId: account.account_id,
+            username: account.username,
+            email: account.email,
+        }
     }
 }

@@ -1,13 +1,15 @@
 
 // interfaces
-import { CreateAccountDTO, ForgotPasswordRequestDTO, ForgotPasswordReturn, RegisterDataReturn, ResetPasswordDTO } from "@/interfaces/IAccount";
+import { AccountDataReturn, ChangeUsernameDTO, CreateAccountDTO, ForgotPasswordRequestDTO, ForgotPasswordReturn, RegisterDataReturn, ResetPasswordDTO } from "@/interfaces/IAccount";
 import { IAccountService } from "@/services/accountService";
 import { IAuthService } from "@/services/authService";
 import { INotificationService } from "@/services/notificationService";
 export interface IAccountOrchestration {
+    getUserAccount(accountId: string): Promise<AccountDataReturn>;
     register(data: CreateAccountDTO): Promise<RegisterDataReturn>;
     forgotPasswordRequest(data: ForgotPasswordRequestDTO): Promise<ForgotPasswordReturn>;
     resetPassword(data: ResetPasswordDTO): Promise<void>;
+    changeUsername(data: ChangeUsernameDTO): Promise<AccountDataReturn>;
 }
 
 export class AccountOrchestration implements IAccountOrchestration {
@@ -16,6 +18,10 @@ export class AccountOrchestration implements IAccountOrchestration {
         private authService: IAuthService,
         private notificationService: INotificationService,
     ) { }
+
+    async getUserAccount(accountId: string): Promise<AccountDataReturn> {
+        return await this.accountService.getAccountById(accountId);
+    }
 
     async register(data: CreateAccountDTO): Promise<RegisterDataReturn> {
 
@@ -63,5 +69,9 @@ export class AccountOrchestration implements IAccountOrchestration {
             key: verifyData.key,
             newPassword: data.newPassword,
         });
+    }
+
+    async changeUsername(data: ChangeUsernameDTO): Promise<AccountDataReturn> {
+        return await this.accountService.changeUsername(data);
     }
 }

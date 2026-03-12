@@ -3,8 +3,8 @@ import { Request, Response } from 'express';
 // exceptions
 import { DataNotFound, Forbidden, NotValid } from '@/utils/exceptions';
 
-// services
-import { authOrchestration } from '@/services';
+// orchestration
+import { authOrchestration } from '@/orchestration';
 
 class AuthController {
     static async login(req: Request, res: Response) {

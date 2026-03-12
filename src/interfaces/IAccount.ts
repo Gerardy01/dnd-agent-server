@@ -25,6 +25,11 @@ export interface ResetPasswordServiceDTO {
     newPassword: string;
 }
 
+export interface ChangeUsernameDTO {
+    accountId: string;
+    username: string;
+}
+
 export type AccountDataReturn = {
     accountId: string;
     username: string;

@@ -1,10 +1,10 @@
 import { Router } from 'express';
 
 // middlewares
-import { validateRequest } from '@/utils/middleware';
+import { authenticate, validateRequest } from '@/utils/middleware';
 
 // schema
-import { ForgotPasswordRequestSchema, RegisterSchema, ResetPasswordRequestSchema } from '@/schema/accountSchema';
+import { ChangeUsernameSchema, ForgotPasswordRequestSchema, RegisterSchema, ResetPasswordRequestSchema } from '@/schema/accountSchema';
 
 // controller
 import AccountController from '@/controller/accountController';
@@ -12,6 +12,11 @@ import AccountController from '@/controller/accountController';
 
 const accountRoutes = Router();
 
+accountRoutes.get(
+    '/action/user',
+    authenticate,
+    AccountController.getUserAccount,
+);
 accountRoutes.post(
     '/action/register',
     validateRequest(RegisterSchema),
@@ -26,6 +31,12 @@ accountRoutes.put(
     '/action/reset-password',
     validateRequest(ResetPasswordRequestSchema),
     AccountController.resetPassword,
+);
+accountRoutes.put(
+    '/action/change-username',
+    authenticate,
+    validateRequest(ChangeUsernameSchema),
+    AccountController.changeUsername,
 );
 
 export default accountRoutes;
