@@ -40,7 +40,3 @@ export type AccountDataReturn = {
 export type RegisterDataReturn = {
     verificationToken: string;
 }
-
-export type ForgotPasswordReturn = {
-    verificationToken: string;
-}

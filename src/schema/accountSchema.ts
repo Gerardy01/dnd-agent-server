@@ -17,5 +17,5 @@ export const ResetPasswordRequestSchema = z.object({
 });
 
 export const ChangeUsernameSchema = z.object({
-    username: z.string().min(1).max(20),
+    username: z.string().min(4).max(20),
 });

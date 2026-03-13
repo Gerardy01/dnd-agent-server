@@ -94,10 +94,10 @@ class AccountController {
 
         } catch (e) {
 
-            if (e instanceof WrongFormat) {
-                return res.status(422).json({
+            if (e instanceof DataNotFound) {
+                return res.status(404).json({
                     "status": "failed",
-                    "message": e.message,
+                    "message": "Account not found",
                     "userMessage": "",
                 });
             }
@@ -122,13 +122,12 @@ class AccountController {
     static async forgotPasswordRequest(req: Request, res: Response) {
         try {
 
-            const data = await accountOrchestration.forgotPasswordRequest(req.body);
+            await accountOrchestration.forgotPasswordRequest(req.body);
 
             return res.status(200).json({
                 "status": "success",
                 "message": "Forgot password request sent successfully",
                 "userMessage": "",
-                "data": data
             });
 
         } catch (e) {

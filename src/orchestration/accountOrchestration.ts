@@ -1,13 +1,13 @@
 
 // interfaces
-import { AccountDataReturn, ChangeUsernameDTO, CreateAccountDTO, ForgotPasswordRequestDTO, ForgotPasswordReturn, RegisterDataReturn, ResetPasswordDTO } from "@/interfaces/IAccount";
+import { AccountDataReturn, ChangeUsernameDTO, CreateAccountDTO, ForgotPasswordRequestDTO, RegisterDataReturn, ResetPasswordDTO } from "@/interfaces/IAccount";
 import { IAccountService } from "@/services/accountService";
 import { IAuthService } from "@/services/authService";
 import { INotificationService } from "@/services/notificationService";
 export interface IAccountOrchestration {
     getUserAccount(accountId: string): Promise<AccountDataReturn>;
     register(data: CreateAccountDTO): Promise<RegisterDataReturn>;
-    forgotPasswordRequest(data: ForgotPasswordRequestDTO): Promise<ForgotPasswordReturn>;
+    forgotPasswordRequest(data: ForgotPasswordRequestDTO): Promise<void>;
     resetPassword(data: ResetPasswordDTO): Promise<void>;
     changeUsername(data: ChangeUsernameDTO): Promise<AccountDataReturn>;
 }
@@ -39,7 +39,7 @@ export class AccountOrchestration implements IAccountOrchestration {
         }
     }
 
-    async forgotPasswordRequest(data: ForgotPasswordRequestDTO): Promise<ForgotPasswordReturn> {
+    async forgotPasswordRequest(data: ForgotPasswordRequestDTO): Promise<void> {
 
         // find account
         const account = await this.accountService.getAccountByEmail(data.email);
@@ -53,9 +53,6 @@ export class AccountOrchestration implements IAccountOrchestration {
         // send email
         await this.notificationService.sendForgotPasswordEmail(account.email, verificationToken);
 
-        return {
-            verificationToken: verificationToken
-        }
     }
 
     async resetPassword(data: ResetPasswordDTO): Promise<void> {
