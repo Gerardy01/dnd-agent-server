@@ -179,6 +179,41 @@ class AuthController {
 
         }
     }
+
+    static async logout(req: Request, res: Response) {
+
+        try {
+
+            const refreshToken = req.cookies.refreshToken || "";
+            await authOrchestration.logout(refreshToken);
+
+            res.clearCookie('refreshToken');
+
+            return res.status(200).json({
+                "status": "success",
+                "message": "logout success",
+                "userMessage": "",
+                "data": true,
+            });
+
+        } catch (e) {
+
+            if (e instanceof NotValid) {
+                return res.status(401).json({
+                    "status": "failed",
+                    "message": "Token not valid",
+                    "userMessage": "",
+                });
+            }
+
+            return res.status(500).json({
+                "status": "failed",
+                "message": "Internal server error",
+                "userMessage": "500",
+                "errors": e
+            });
+        }
+    }
 }
 
 export default AuthController;

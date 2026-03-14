@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 // middlewares
-import { validateRequest } from '@/utils/middleware';
+import { authenticate, validateRequest } from '@/utils/middleware';
 
 // schema
 import { GenerateOtpSchema, LoginSchema, VerifyOtpSchema } from '@/schema/authSchema';
@@ -29,6 +29,11 @@ authRoutes.post(
     '/verify-otp',
     validateRequest(VerifyOtpSchema),
     AuthController.otpVerification
-)
+);
+authRoutes.post(
+    '/logout',
+    authenticate,
+    AuthController.logout
+);
 
 export default authRoutes;

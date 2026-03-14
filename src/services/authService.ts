@@ -25,6 +25,7 @@ export interface IAuthService {
     getVaildRefreshSession(identifier: string): Promise<RefreshSessionReturn>;
     verifyAccessToken(accessToken: string): Promise<AccessTokenBody>;
     verifyResetPassToken(token: string): Promise<VerifyResetPassTokenReturn>;
+    revokeAccessToken(identifier: string): Promise<void>;
 }
 
 export class AuthService implements IAuthService {
@@ -204,6 +205,23 @@ export class AuthService implements IAuthService {
         if (!decoded) throw new NotValid("Token not valid");
 
         return decoded;
+    }
+
+    async revokeAccessToken(identifier: string): Promise<void> {
+        const refreshSession = await RefreshToken.findOne({
+            where: {
+                identifier: identifier,
+                is_revoked: false,
+                token_expiry_date: { [Op.gt]: new Date() },
+            },
+        });
+
+        if (!refreshSession) {
+            throw new NotValid("Refresh token is not valid");
+        }
+
+        refreshSession.is_revoked = true;
+        await refreshSession.save();
     }
 
     private async checkAndRevokeSession(accountId: string, cap: number = 3, transaction?: Transaction): Promise<void> {

@@ -9,6 +9,7 @@ export interface IAuthOrchestration {
     otpVerification(data: VerifyOtpDTO): Promise<VerifyOtpReturn>;
     login(data: LoginDTO): Promise<LoginDataReturn>;
     getNewAccessToken(identifier: string): Promise<string>;
+    logout(identifier: string): Promise<void>;
 }
 
 export class AuthOrchestration implements IAuthOrchestration {
@@ -93,5 +94,9 @@ export class AuthOrchestration implements IAuthOrchestration {
         });
 
         return accessToken;
+    }
+
+    async logout(identifier: string): Promise<void> {
+        await this.authService.revokeAccessToken(identifier);
     }
 }
