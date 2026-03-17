@@ -4,15 +4,18 @@ import { AccountOrchestration } from "@/orchestration/accountOrchestration";
 import { NotificationOrchestration } from "@/orchestration/notificationOrchestration";
 
 // services
-import { authService } from "@/services";
-import { accountService } from "@/services";
-import { notificationService } from "@/services";
+import {
+    authService,
+    accountService,
+    notificationService,
+} from "@/services";
 
 // providers
-import { InMemoryEventPublisher } from "@/provider/eventPublisherProvider";
+import {
+    inMemoryEventPublisher
+} from "@/provider";
 
-// providers init
-const inMemoryEventPublisher = new InMemoryEventPublisher();
+
 
 // orchestration init
 export const authOrchestration = new AuthOrchestration(

@@ -87,9 +87,11 @@ class AuthController {
 
             res.cookie('refreshToken', result.refreshToken, {
                 httpOnly: true,
-                secure: true,
+                // secure: true,
+                secure: false,
                 maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days in milliseconds (following token expiry time)
-                sameSite: 'none'
+                // sameSite: 'none',
+                sameSite: 'lax',
             });
 
             return res.status(200).json({
