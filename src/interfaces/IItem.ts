@@ -1,4 +1,27 @@
 
+export interface CreateItemDTO {
+    accountId: string;
+    image?: string;
+    name: string;
+    type: string;
+    description: string;
+    appearance: string;
+    category: string;
+    rarity: string;
+    isMagicItem: boolean;
+    weight: number;
+    cost: number;
+    currencyUnit: string;
+    equipSlot?: string;
+    weaponProperties?: WeaponProperties | null;
+    armorProperties?: ArmorProperties | null;
+    additionalProperties?: AdditionalProperties | null;
+    flatBonus?: ItemBonus | null;
+    overrideBonus?: ItemBonus | null;
+    modifierBonus?: ModifierBonus[] | null;
+}
+
+
 
 export type DamageRoll = {
     count: number;
@@ -49,7 +72,45 @@ export type AdditionalProperties = {
 }
 
 
-
 export type ItemBonus = {
+    str: number;
+    dex: number;
+    con: number;
+    int: number;
+    wis: number;
+    cha: number;
+    ac: number;
+    speed: number;
+    hp: number;
+}
 
+
+export type ModifierBonus = {
+    from: string;
+    to: string;
+    value: number;
+}
+
+export type ItemDataReturn = {
+    workshopItemId: number;
+    accountId: string;
+    image: string | null;
+    name: string;
+    type: string;
+    description: string;
+    appearance: string;
+    category: string;
+    rarity: string;
+    isMagicItem: boolean;
+    weight: number;
+    cost: number;
+    currencyUnit: string;
+    equipSlot: string | null;
+    weaponProperties: WeaponProperties | null;
+    armorProperties: ArmorProperties | null;
+    additionalProperties: AdditionalProperties | null;
+    flatBonus: ItemBonus | null;
+    overrideBonus: ItemBonus | null;
+    modifierBonus: ModifierBonus[] | null;
+    createdAt: Date;
 }

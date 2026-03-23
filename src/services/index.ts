@@ -2,6 +2,7 @@
 import { AccountService } from "@/services/accountService";
 import { AuthService } from "@/services/authService";
 import { NotificationService } from "@/services/notificationService";
+import { ItemService } from "@/services/itemService";
 
 // providers
 import {
@@ -26,3 +27,4 @@ export const authService = new AuthService(
 export const notificationService = new NotificationService(
     nodeMailerEmailProvider,
 );
+export const itemService = new ItemService();

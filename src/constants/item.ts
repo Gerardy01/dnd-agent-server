@@ -92,3 +92,18 @@ export const EQUIP_SLOT = [
 ] as const;
 export type EquipSlot = typeof EQUIP_SLOT[number];
 
+
+export const ITEM_BONUS_SELECTION = [
+    "Strength",
+    "Dexterity",
+    "Constitution",
+    "Intelligence",
+    "Wisdom",
+    "Charisma",
+    "Armor Class",
+    "Speed",
+    "Max HP",
+] as const;
+export type ItemBonusSelection = typeof ITEM_BONUS_SELECTION[number];
+
+

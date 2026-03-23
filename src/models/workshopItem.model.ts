@@ -2,7 +2,7 @@ import { Model, DataTypes } from "sequelize";
 import sequelize from "@/config/database";
 
 // interfaces
-import { AdditionalProperties, ArmorProperties, WeaponProperties } from "@/interfaces/IItem";
+import { AdditionalProperties, ArmorProperties, ItemBonus, ModifierBonus, WeaponProperties } from "@/interfaces/IItem";
 
 // models
 import Account from "@/models/account.model";
@@ -22,11 +22,14 @@ class WorkshopItem extends Model {
     declare public cost: number;
     declare public currency_unit: string;
     declare public equip_slot: string;
-    declare public weapon_properties: WeaponProperties;
-    declare public armor_properties: ArmorProperties;
+    declare public weapon_properties: WeaponProperties | null;
+    declare public armor_properties: ArmorProperties | null;
     declare public additional_properties: AdditionalProperties;
-    declare public readonly created_at: Date;
-    declare public readonly updated_at: Date;
+    declare public flat_bonus: ItemBonus | null;
+    declare public override_bonus: ItemBonus | null;
+    declare public modifier_bonus: ModifierBonus[] | null;
+    declare public readonly createdAt: Date;
+    declare public readonly updatedAt: Date;
 }
 
 WorkshopItem.init({
@@ -111,6 +114,18 @@ WorkshopItem.init({
             vulnerabilities: [],
             conditionImmunities: [],
         }
+    },
+    flat_bonus: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+    },
+    override_bonus: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+    },
+    modifier_bonus: {
+        type: DataTypes.JSONB,
+        allowNull: true,
     },
 }, {
     sequelize,
