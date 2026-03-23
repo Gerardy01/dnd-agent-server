@@ -65,7 +65,29 @@ const ModifierBonusSchema = z.object({
     value: z.number().int(),
 });
 
-export const CreateItemSchema = z.object({
+export const CreateWorkshopItemSchema = z.object({
+    image: z.string().optional(),
+    name: z.string().min(1).max(100),
+    type: z.enum(ITEM_TYPE as any),
+    description: z.string().max(500),
+    appearance: z.string().max(500),
+    category: z.string(),
+    rarity: z.string(),
+    isMagicItem: z.boolean(),
+    weight: z.number().min(0),
+    cost: z.number().min(0),
+    currencyUnit: z.string(),
+    equipSlot: z.string().optional().nullable(),
+    weaponProperties: WeaponPropertiesSchema.optional().nullable(),
+    armorProperties: ArmorPropertiesSchema.optional().nullable(),
+    additionalProperties: AdditionalPropertiesSchema.optional().nullable(),
+    flatBonus: ItemBonusSchema.optional().nullable(),
+    overrideBonus: ItemBonusSchema.optional().nullable(),
+    modifierBonus: z.array(ModifierBonusSchema).optional().nullable(),
+});
+
+export const UpdateWorkshopItemSchema = z.object({
+    workshopItemId: z.number().int().positive(),
     image: z.string().optional(),
     name: z.string().min(1).max(100),
     type: z.enum(ITEM_TYPE as any),

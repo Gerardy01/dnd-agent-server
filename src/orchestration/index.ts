@@ -2,14 +2,14 @@
 import { AuthOrchestration } from "@/orchestration/authOrchestration";
 import { AccountOrchestration } from "@/orchestration/accountOrchestration";
 import { NotificationOrchestration } from "@/orchestration/notificationOrchestration";
-import { ItemOrchestration } from "@/orchestration/itemOrchestration";
+import { WorkshopItemOrchestration } from "@/orchestration/workshopItemOrchestration";
 
 // services
 import {
     authService,
     accountService,
     notificationService,
-    itemService,
+    workshopItemService,
 } from "@/services";
 
 // providers
@@ -33,6 +33,6 @@ export const notificationOrchestration = new NotificationOrchestration(
     notificationService,
     inMemoryEventPublisher,
 );
-export const itemOrchestration = new ItemOrchestration(
-    itemService,
+export const itemOrchestration = new WorkshopItemOrchestration(
+    workshopItemService,
 );

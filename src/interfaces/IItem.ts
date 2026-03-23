@@ -1,5 +1,5 @@
 
-export interface CreateItemDTO {
+export interface CreateWorkshopItemDTO {
     accountId: string;
     image?: string;
     name: string;
@@ -13,6 +13,29 @@ export interface CreateItemDTO {
     cost: number;
     currencyUnit: string;
     equipSlot?: string;
+    weaponProperties?: WeaponProperties | null;
+    armorProperties?: ArmorProperties | null;
+    additionalProperties?: AdditionalProperties | null;
+    flatBonus?: ItemBonus | null;
+    overrideBonus?: ItemBonus | null;
+    modifierBonus?: ModifierBonus[] | null;
+}
+
+export interface UpdateWorkshopItemDTO {
+    workshopItemId: number;
+    accountId: string;
+    image?: string;
+    name: string;
+    type: string;
+    description: string;
+    appearance: string;
+    category: string;
+    rarity: string;
+    isMagicItem: boolean;
+    weight: number;
+    cost: number;
+    currencyUnit: string;
+    equipSlot?: string | null;
     weaponProperties?: WeaponProperties | null;
     armorProperties?: ArmorProperties | null;
     additionalProperties?: AdditionalProperties | null;
@@ -91,7 +114,7 @@ export type ModifierBonus = {
     value: number;
 }
 
-export type ItemDataReturn = {
+export type WorkshopItemDataReturn = {
     workshopItemId: number;
     accountId: string;
     image: string | null;
