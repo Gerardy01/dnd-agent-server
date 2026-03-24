@@ -8,6 +8,9 @@ import { ExistData, WrongFormat, DataNotFound } from "@/utils/exceptions";
 // constants
 import { WEAPON_CATEGORIES, ARMOR_CATEGORIES, GEAR_CATEGORIES } from "@/constants/item";
 
+// utils
+import { EquipSlotEnum, ItemTypeEnum } from "@/utils/enums";
+
 // interfaces
 import { CreateWorkshopItemDTO, UpdateWorkshopItemDTO, WorkshopItemDataReturn } from "@/interfaces/IItem";
 export interface IWorkshopItemService {
@@ -93,7 +96,7 @@ export class WorkshopItemService implements IWorkshopItemService {
 
     async createItem(data: CreateWorkshopItemDTO): Promise<WorkshopItemDataReturn> {
 
-        if (data.type === 'Weapon') {
+        if (data.type === ItemTypeEnum.WEAPON) {
             if (!data.weaponProperties) {
                 throw new WrongFormat("weaponProperties must not be null when type is Weapon");
             }
@@ -107,7 +110,7 @@ export class WorkshopItemService implements IWorkshopItemService {
             }
         }
 
-        if (data.type === 'Armor') {
+        if (data.type === ItemTypeEnum.ARMOR) {
             if (!data.armorProperties) {
                 throw new WrongFormat("armorProperties must not be null when type is Armor");
             }
@@ -121,7 +124,7 @@ export class WorkshopItemService implements IWorkshopItemService {
             }
         }
 
-        if (data.type === 'Gear') {
+        if (data.type === ItemTypeEnum.GEAR) {
             if (data.weaponProperties !== null && data.weaponProperties !== undefined) {
                 throw new WrongFormat("weaponProperties must be null when type is Gear");
             }
@@ -133,6 +136,16 @@ export class WorkshopItemService implements IWorkshopItemService {
             if (!GEAR_CATEGORIES.includes(data.category as any)) {
                 throw new WrongFormat("category must be a valid gear category");
             }
+        }
+
+        let equipSlot = data.equipSlot || null;
+
+        if (data.type === ItemTypeEnum.ARMOR) {
+            equipSlot = EquipSlotEnum.ARMOR;
+        }
+
+        if (data.type === ItemTypeEnum.WEAPON) {
+            equipSlot = data.weaponProperties?.twoHanded ? EquipSlotEnum.TWO_HAND : EquipSlotEnum.HAND;
         }
 
         const newItem = await WorkshopItem.create({
@@ -148,7 +161,7 @@ export class WorkshopItemService implements IWorkshopItemService {
             weight: data.weight,
             cost: data.cost,
             currency_unit: data.currencyUnit,
-            equip_slot: data.equipSlot || null,
+            equip_slot: equipSlot,
             weapon_properties: data.weaponProperties || null,
             armor_properties: data.armorProperties || null,
             additional_properties: data.additionalProperties || {
@@ -235,6 +248,16 @@ export class WorkshopItemService implements IWorkshopItemService {
             }
         }
 
+        let equipSlot = data.equipSlot || null;
+
+        if (data.type === ItemTypeEnum.ARMOR) {
+            equipSlot = EquipSlotEnum.ARMOR;
+        }
+
+        if (data.type === ItemTypeEnum.WEAPON) {
+            equipSlot = data.weaponProperties?.twoHanded ? EquipSlotEnum.TWO_HAND : EquipSlotEnum.HAND;
+        }
+
         await item.update({
             image: data.image ?? item.image,
             name: data.name,
@@ -247,7 +270,7 @@ export class WorkshopItemService implements IWorkshopItemService {
             weight: data.weight,
             cost: data.cost,
             currency_unit: data.currencyUnit,
-            equip_slot: data.equipSlot ?? null,
+            equip_slot: equipSlot,
             weapon_properties: data.weaponProperties ?? null,
             armor_properties: data.armorProperties ?? null,
             additional_properties: data.additionalProperties ?? {

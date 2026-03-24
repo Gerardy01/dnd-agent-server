@@ -89,6 +89,7 @@ export const EQUIP_SLOT = [
     "Ammunition",
     "Left Hand",
     "Right Hand",
+    "Two Handed",
 ] as const;
 export type EquipSlot = typeof EQUIP_SLOT[number];
 
