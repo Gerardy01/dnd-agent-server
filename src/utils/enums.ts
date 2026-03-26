@@ -6,24 +6,24 @@ export enum EventTypeEnum {
 
 
 export enum ItemTypeEnum {
-    GEAR = "Gear",
-    WEAPON = "Weapon",
-    ARMOR = "Armor",
+    GEAR = "gear",
+    WEAPON = "weapon",
+    ARMOR = "armor",
 }
 
 export enum EquipSlotEnum {
-    ARMOR = "Armor",
-    HAND = "Hand",
-    HEAD = "Head",
-    NECK = "Neck",
-    BACK = "Back",
-    LEGS = "Legs",
-    BELT = "Belt",
-    RING = "Ring",
-    FEET = "Feet",
-    GLOVES = "Gloves",
-    AMMUNITION = "Ammunition",
-    LEFT_HAND = "Left Hand",
-    RIGHT_HAND = "Right Hand",
-    TWO_HAND = "Two Handed",
+    ARMOR = "armor",
+    HAND = "hand",
+    HEAD = "head",
+    NECK = "neck",
+    BACK = "back",
+    LEGS = "legs",
+    BELT = "belt",
+    RING = "ring",
+    FEET = "feet",
+    GLOVES = "gloves",
+    AMMUNITION = "ammunition",
+    LEFT_HAND = "left_hand",
+    RIGHT_HAND = "right_hand",
+    TWO_HAND = "two_handed",
 }

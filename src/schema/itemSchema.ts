@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { ITEM_TYPE } from '@/constants/item';
 
 const DamageRollSchema = z.object({
     count: z.number().int().min(1),
@@ -68,11 +67,11 @@ const ModifierBonusSchema = z.object({
 export const CreateWorkshopItemSchema = z.object({
     image: z.string().optional(),
     name: z.string().min(1).max(100),
-    type: z.enum(ITEM_TYPE as any),
-    description: z.string().max(500),
-    appearance: z.string().max(500),
-    category: z.string(),
-    rarity: z.string(),
+    type: z.string().min(1),
+    description: z.string().min(1).max(500),
+    appearance: z.string().min(1).max(500),
+    category: z.string().min(1),
+    rarity: z.string().min(1),
     isMagicItem: z.boolean(),
     weight: z.number().min(0),
     cost: z.number().min(0),
@@ -90,11 +89,11 @@ export const UpdateWorkshopItemSchema = z.object({
     workshopItemId: z.number().int().positive(),
     image: z.string().optional(),
     name: z.string().min(1).max(100),
-    type: z.enum(ITEM_TYPE as any),
-    description: z.string().max(500),
-    appearance: z.string().max(500),
-    category: z.string(),
-    rarity: z.string(),
+    type: z.string().min(1),
+    description: z.string().min(1).max(500),
+    appearance: z.string().min(1).max(500),
+    category: z.string().min(1),
+    rarity: z.string().min(1),
     isMagicItem: z.boolean(),
     weight: z.number().min(0),
     cost: z.number().min(0),

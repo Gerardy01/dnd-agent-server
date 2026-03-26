@@ -3,6 +3,7 @@ import { AccountService } from "@/services/accountService";
 import { AuthService } from "@/services/authService";
 import { NotificationService } from "@/services/notificationService";
 import { WorkshopItemService } from "@/services/workshopItemService";
+import { ReferenceService } from "@/services/referenceService";
 
 // providers
 import {
@@ -28,3 +29,4 @@ export const notificationService = new NotificationService(
     nodeMailerEmailProvider,
 );
 export const workshopItemService = new WorkshopItemService();
+export const referenceService = new ReferenceService();
