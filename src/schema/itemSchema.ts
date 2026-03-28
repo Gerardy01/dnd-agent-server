@@ -16,7 +16,7 @@ const WeaponPropertiesSchema = z.object({
     twoHanded: z.boolean(),
     range: z.object({
         normal: z.number().int(),
-        long: z.number().int(),
+        long: z.number().int().nullable(),
     }).nullable(),
     versatileDamageRoll: DamageRollSchema.nullable(),
     ammunition: z.boolean(),
