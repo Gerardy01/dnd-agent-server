@@ -3,7 +3,7 @@
 import WorkshopItem from "@/models/workshopItem.model";
 
 // exceptions
-import { ExistData, WrongFormat, DataNotFound } from "@/utils/exceptions";
+import { WrongFormat, DataNotFound } from "@/utils/exceptions";
 
 // constants
 import { WEAPON_CATEGORIES, ARMOR_CATEGORIES, GEAR_CATEGORIES } from "@/constants/item";
@@ -12,12 +12,12 @@ import { WEAPON_CATEGORIES, ARMOR_CATEGORIES, GEAR_CATEGORIES } from "@/constant
 import { EquipSlotEnum, ItemTypeEnum } from "@/utils/enums";
 
 // interfaces
-import { CreateWorkshopItemDTO, UpdateWorkshopItemDTO, WorkshopItemDataReturn } from "@/interfaces/IItem";
+import { CreateItemDTO, UpdateItemDTO, WorkshopItemDataReturn } from "@/interfaces/IItem";
 export interface IWorkshopItemService {
     getItems(accountId: string): Promise<WorkshopItemDataReturn[]>;
     getOneItem(workshopItemId: number, accountId: string): Promise<WorkshopItemDataReturn>;
-    createItem(data: CreateWorkshopItemDTO): Promise<WorkshopItemDataReturn>;
-    editItem(data: UpdateWorkshopItemDTO): Promise<WorkshopItemDataReturn>;
+    createItem(data: CreateItemDTO, accountId: string): Promise<WorkshopItemDataReturn>;
+    editItem(data: UpdateItemDTO, accountId: string): Promise<WorkshopItemDataReturn>;
     deleteItem(workshopItemId: number, accountId: string): Promise<void>;
 }
 
@@ -94,7 +94,7 @@ export class WorkshopItemService implements IWorkshopItemService {
         };
     }
 
-    async createItem(data: CreateWorkshopItemDTO): Promise<WorkshopItemDataReturn> {
+    async createItem(data: CreateItemDTO, accountId: string): Promise<WorkshopItemDataReturn> {
 
         if (data.type === ItemTypeEnum.WEAPON) {
             if (!data.weaponProperties) {
@@ -149,7 +149,7 @@ export class WorkshopItemService implements IWorkshopItemService {
         }
 
         const newItem = await WorkshopItem.create({
-            account_id: data.accountId,
+            account_id: accountId,
             image: data.image || null,
             name: data.name,
             type: data.type,
@@ -200,11 +200,11 @@ export class WorkshopItemService implements IWorkshopItemService {
         }
     }
 
-    async editItem(data: UpdateWorkshopItemDTO): Promise<WorkshopItemDataReturn> {
+    async editItem(data: UpdateItemDTO, accountId: string): Promise<WorkshopItemDataReturn> {
         const item = await WorkshopItem.findOne({
             where: {
                 workshop_item_id: data.workshopItemId,
-                account_id: data.accountId,
+                account_id: accountId,
             }
         });
 

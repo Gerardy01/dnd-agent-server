@@ -1,12 +1,12 @@
 // interfaces
-import { CreateWorkshopItemDTO, UpdateWorkshopItemDTO, WorkshopItemDataReturn } from "@/interfaces/IItem";
+import { CreateItemDTO, UpdateItemDTO, WorkshopItemDataReturn } from "@/interfaces/IItem";
 import { IWorkshopItemService } from "@/services/workshopItemService";
 
 export interface IWorkshopItemOrchestration {
     getItems(accountId: string): Promise<WorkshopItemDataReturn[]>;
     getOneItem(workshopItemId: number, accountId: string): Promise<WorkshopItemDataReturn>;
-    createItem(data: CreateWorkshopItemDTO): Promise<WorkshopItemDataReturn>;
-    editItem(data: UpdateWorkshopItemDTO): Promise<WorkshopItemDataReturn>;
+    createItem(data: CreateItemDTO, accountId: string): Promise<WorkshopItemDataReturn>;
+    editItem(data: UpdateItemDTO, accountId: string): Promise<WorkshopItemDataReturn>;
     deleteItem(workshopItemId: number, accountId: string): Promise<void>;
 }
 
@@ -23,12 +23,12 @@ export class WorkshopItemOrchestration implements IWorkshopItemOrchestration {
         return await this.itemService.getOneItem(workshopItemId, accountId);
     }
 
-    async createItem(data: CreateWorkshopItemDTO): Promise<WorkshopItemDataReturn> {
-        return await this.itemService.createItem(data);
+    async createItem(data: CreateItemDTO, accountId: string): Promise<WorkshopItemDataReturn> {
+        return await this.itemService.createItem(data, accountId);
     }
 
-    async editItem(data: UpdateWorkshopItemDTO): Promise<WorkshopItemDataReturn> {
-        return await this.itemService.editItem(data);
+    async editItem(data: UpdateItemDTO, accountId: string): Promise<WorkshopItemDataReturn> {
+        return await this.itemService.editItem(data, accountId);
     }
 
     async deleteItem(workshopItemId: number, accountId: string): Promise<void> {

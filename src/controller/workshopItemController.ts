@@ -66,7 +66,7 @@ class WorkshopItemController {
     static async createItem(req: Request, res: Response) {
         try {
             const accountId = req.user?.accountId || "";
-            const data = await itemOrchestration.createItem({ ...req.body, accountId });
+            const data = await itemOrchestration.createItem(req.body, accountId);
 
             return res.status(201).json({
                 "status": "success",
@@ -97,7 +97,7 @@ class WorkshopItemController {
     static async editItem(req: Request, res: Response) {
         try {
             const accountId = req.user?.accountId || "";
-            const data = await itemOrchestration.editItem({ ...req.body, accountId });
+            const data = await itemOrchestration.editItem(req.body, accountId);
 
             return res.status(200).json({
                 "status": "success",
