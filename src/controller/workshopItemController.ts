@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 // exceptions
-import { WrongFormat, ExistData, DataNotFound, NotValid } from '@/utils/exceptions';
+import { WrongFormat, DataNotFound } from '@/utils/exceptions';
 
 // orchestration
 import { itemOrchestration } from '@/orchestration';

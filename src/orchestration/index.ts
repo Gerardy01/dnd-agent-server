@@ -4,6 +4,7 @@ import { AccountOrchestration } from "@/orchestration/accountOrchestration";
 import { NotificationOrchestration } from "@/orchestration/notificationOrchestration";
 import { WorkshopItemOrchestration } from "@/orchestration/workshopItemOrchestration";
 import { ReferenceOrchestration } from "@/orchestration/referenceOrchestration";
+import { FileOrchestration } from "@/orchestration/fileOrchestration";
 
 // services
 import {
@@ -12,6 +13,7 @@ import {
     notificationService,
     workshopItemService,
     referenceService,
+    fileService,
 } from "@/services";
 
 // providers
@@ -40,4 +42,7 @@ export const itemOrchestration = new WorkshopItemOrchestration(
 );
 export const referenceOrchestration = new ReferenceOrchestration(
     referenceService,
+);
+export const fileOrchestration = new FileOrchestration(
+    fileService,
 );
