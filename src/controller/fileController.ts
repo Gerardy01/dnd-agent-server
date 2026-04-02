@@ -1,5 +1,8 @@
 import { Request, Response } from 'express';
 
+// exceptions
+import { Forbidden } from '@/utils/exceptions';
+
 // orchestration
 import { fileOrchestration } from '@/orchestration';
 
@@ -18,6 +21,15 @@ class FileController {
             });
 
         } catch (e) {
+
+            if (e instanceof Forbidden) {
+                return res.status(403).json({
+                    "status": "failed",
+                    "message": "File can't be more than 10mb",
+                    "userMessage": e.message,
+                    "errors": e
+                });
+            }
 
             return res.status(500).json({
                 "status": "failed",

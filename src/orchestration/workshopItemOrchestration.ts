@@ -1,7 +1,9 @@
+import sequelize from '@/config/database';
+
 // interfaces
 import { CreateItemDTO, UpdateItemDTO, WorkshopItemDataReturn } from "@/interfaces/IItem";
+import { IFileService } from "@/services/fileService";
 import { IWorkshopItemService } from "@/services/workshopItemService";
-
 export interface IWorkshopItemOrchestration {
     getItems(accountId: string): Promise<WorkshopItemDataReturn[]>;
     getOneItem(workshopItemId: number, accountId: string): Promise<WorkshopItemDataReturn>;
@@ -13,6 +15,7 @@ export interface IWorkshopItemOrchestration {
 export class WorkshopItemOrchestration implements IWorkshopItemOrchestration {
     constructor(
         private itemService: IWorkshopItemService,
+        private fileService: IFileService,
     ) { }
 
     async getItems(accountId: string): Promise<WorkshopItemDataReturn[]> {
@@ -24,7 +27,25 @@ export class WorkshopItemOrchestration implements IWorkshopItemOrchestration {
     }
 
     async createItem(data: CreateItemDTO, accountId: string): Promise<WorkshopItemDataReturn> {
-        return await this.itemService.createItem(data, accountId);
+        const transaction = await sequelize.transaction();
+
+        try {
+            const newItem = await this.itemService.createItem(data, accountId, transaction);
+            const imageKey = await this.fileService.moveTempFileToFinalLocation(
+                data.image ?? "",
+                `user/uploads/workshop/item/${newItem.workshopItemId}-${accountId}-${Date.now()}`
+            );
+
+            await transaction.commit();
+
+            await this.itemService.updateItemImage(newItem.workshopItemId, accountId, imageKey);
+
+            return newItem;
+
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
     }
 
     async editItem(data: UpdateItemDTO, accountId: string): Promise<WorkshopItemDataReturn> {
@@ -32,6 +53,8 @@ export class WorkshopItemOrchestration implements IWorkshopItemOrchestration {
     }
 
     async deleteItem(workshopItemId: number, accountId: string): Promise<void> {
-        return await this.itemService.deleteItem(workshopItemId, accountId);
+        const item = await this.itemService.getOneItem(workshopItemId, accountId);
+        await this.fileService.deleteFile(item.image ?? "");
+        await this.itemService.deleteItem(workshopItemId, accountId);
     }
 }

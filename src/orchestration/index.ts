@@ -39,6 +39,7 @@ export const notificationOrchestration = new NotificationOrchestration(
 );
 export const itemOrchestration = new WorkshopItemOrchestration(
     workshopItemService,
+    fileService,
 );
 export const referenceOrchestration = new ReferenceOrchestration(
     referenceService,

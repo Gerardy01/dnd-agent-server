@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 
 // models
 import WorkshopItem from "@/models/workshopItem.model";
@@ -16,9 +17,10 @@ import { CreateItemDTO, UpdateItemDTO, WorkshopItemDataReturn } from "@/interfac
 export interface IWorkshopItemService {
     getItems(accountId: string): Promise<WorkshopItemDataReturn[]>;
     getOneItem(workshopItemId: number, accountId: string): Promise<WorkshopItemDataReturn>;
-    createItem(data: CreateItemDTO, accountId: string): Promise<WorkshopItemDataReturn>;
+    createItem(data: CreateItemDTO, accountId: string, transaction?: Transaction): Promise<WorkshopItemDataReturn>;
     editItem(data: UpdateItemDTO, accountId: string): Promise<WorkshopItemDataReturn>;
     deleteItem(workshopItemId: number, accountId: string): Promise<void>;
+    updateItemImage(workshopItemId: number, accountId: string, image: string): Promise<void>;
 }
 
 
@@ -32,10 +34,12 @@ export class WorkshopItemService implements IWorkshopItemService {
             order: [['created_at', 'DESC']]
         });
 
+        const imageBaseUrl = process.env.FILE_PUBLIC_URL || "";
+
         return items.map(item => ({
             workshopItemId: item.workshop_item_id,
             accountId: item.account_id,
-            image: item.image,
+            image: item.image ? `${imageBaseUrl}/${item.image}` : "",
             name: item.name,
             type: item.type,
             description: item.description,
@@ -69,10 +73,12 @@ export class WorkshopItemService implements IWorkshopItemService {
             throw new DataNotFound("ITEM001");
         }
 
+        const imageBaseUrl = process.env.FILE_PUBLIC_URL || "";
+
         return {
             workshopItemId: item.workshop_item_id,
             accountId: item.account_id,
-            image: item.image,
+            image: item.image ? `${imageBaseUrl}/${item.image}` : "",
             name: item.name,
             type: item.type,
             description: item.description,
@@ -94,7 +100,7 @@ export class WorkshopItemService implements IWorkshopItemService {
         };
     }
 
-    async createItem(data: CreateItemDTO, accountId: string): Promise<WorkshopItemDataReturn> {
+    async createItem(data: CreateItemDTO, accountId: string, transaction?: Transaction): Promise<WorkshopItemDataReturn> {
 
         if (data.type === ItemTypeEnum.WEAPON) {
             if (!data.weaponProperties) {
@@ -150,7 +156,7 @@ export class WorkshopItemService implements IWorkshopItemService {
 
         const newItem = await WorkshopItem.create({
             account_id: accountId,
-            image: data.image || null,
+            image: "",
             name: data.name,
             type: data.type,
             description: data.description,
@@ -173,7 +179,7 @@ export class WorkshopItemService implements IWorkshopItemService {
             flat_bonus: data.flatBonus || null,
             override_bonus: data.overrideBonus || null,
             modifier_bonus: data.modifierBonus || null,
-        });
+        }, { transaction: transaction ?? null });
 
         return {
             workshopItemId: newItem.workshop_item_id,
@@ -322,5 +328,26 @@ export class WorkshopItemService implements IWorkshopItemService {
         }
 
         await item.destroy();
+    }
+
+    async updateItemImage(workshopItemId: number, accountId: string, image: string): Promise<void> {
+        if (!image) return;
+
+        console.log("accountId", accountId, "workshopItemId", workshopItemId, "image", image);
+
+        const item = await WorkshopItem.findOne({
+            where: {
+                workshop_item_id: workshopItemId,
+                account_id: accountId,
+            }
+        });
+
+        if (!item) {
+            throw new DataNotFound("ITEM001");
+        }
+
+        await item.update({
+            image: image,
+        });
     }
 }

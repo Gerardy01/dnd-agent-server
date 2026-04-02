@@ -1,8 +1,12 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand, CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
+// interfaces
+import { GetPresignedUrlDTO } from '@/interfaces/IFile';
 export interface IStorageProvider {
-    getPresignedUrl(key: string, operation: 'put' | 'get', expiresIn?: number, contentType?: string): Promise<string>;
+    getPresignedUrl(data: GetPresignedUrlDTO): Promise<string>;
+    copyFile(sourceKey: string, destinationKey: string): Promise<void>;
+    deleteFile(key: string): Promise<void>;
 }
 
 export class CloudflareR2StorageProvider implements IStorageProvider {
@@ -22,11 +26,30 @@ export class CloudflareR2StorageProvider implements IStorageProvider {
         });
     }
 
-    async getPresignedUrl(key: string, operation: 'put' | 'get' = 'put', expiresIn: number = 3600, contentType?: string): Promise<string> {
-        const command = operation === 'put'
-            ? new PutObjectCommand({ Bucket: this.bucketName, Key: key, ContentType: contentType })
-            : new GetObjectCommand({ Bucket: this.bucketName, Key: key });
+    async getPresignedUrl(data: GetPresignedUrlDTO): Promise<string> {
+        const command = data.operation === 'put'
+            ? new PutObjectCommand({ Bucket: this.bucketName, Key: data.key, ContentType: data.contentType, ContentLength: data.contentLength })
+            : new GetObjectCommand({ Bucket: this.bucketName, Key: data.key });
 
-        return await getSignedUrl(this.client, command, { expiresIn });
+        return await getSignedUrl(this.client, command, { expiresIn: data.expiresIn || 3600 });
+    }
+
+    async copyFile(sourceKey: string, destinationKey: string): Promise<void> {
+        const command = new CopyObjectCommand({
+            Bucket: this.bucketName,
+            CopySource: `${this.bucketName}/${sourceKey}`,
+            Key: destinationKey,
+        });
+
+        await this.client.send(command);
+    }
+
+    async deleteFile(key: string): Promise<void> {
+        const command = new DeleteObjectCommand({
+            Bucket: this.bucketName,
+            Key: key,
+        });
+
+        await this.client.send(command);
     }
 }
