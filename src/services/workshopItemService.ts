@@ -16,7 +16,7 @@ import { EquipSlotEnum, ItemTypeEnum } from "@/utils/enums";
 import { CreateItemDTO, UpdateItemDTO, WorkshopItemDataReturn } from "@/interfaces/IItem";
 export interface IWorkshopItemService {
     getItems(accountId: string): Promise<WorkshopItemDataReturn[]>;
-    getOneItem(workshopItemId: number, accountId: string): Promise<WorkshopItemDataReturn>;
+    getOneItem(workshopItemId: number, accountId: string, imageKeyOnly?: boolean): Promise<WorkshopItemDataReturn>;
     createItem(data: CreateItemDTO, accountId: string, transaction?: Transaction): Promise<WorkshopItemDataReturn>;
     editItem(data: UpdateItemDTO, accountId: string): Promise<WorkshopItemDataReturn>;
     deleteItem(workshopItemId: number, accountId: string): Promise<void>;
@@ -61,7 +61,7 @@ export class WorkshopItemService implements IWorkshopItemService {
         }));
     }
 
-    async getOneItem(workshopItemId: number, accountId: string): Promise<WorkshopItemDataReturn> {
+    async getOneItem(workshopItemId: number, accountId: string, imageKeyOnly?: boolean): Promise<WorkshopItemDataReturn> {
         const item = await WorkshopItem.findOne({
             where: {
                 workshop_item_id: workshopItemId,
@@ -75,10 +75,12 @@ export class WorkshopItemService implements IWorkshopItemService {
 
         const imageBaseUrl = process.env.FILE_PUBLIC_URL || "";
 
+        const image = imageKeyOnly ? item.image : item.image ? `${imageBaseUrl}/${item.image}` : "";
+
         return {
             workshopItemId: item.workshop_item_id,
             accountId: item.account_id,
-            image: item.image ? `${imageBaseUrl}/${item.image}` : "",
+            image: image,
             name: item.name,
             type: item.type,
             description: item.description,
@@ -153,6 +155,8 @@ export class WorkshopItemService implements IWorkshopItemService {
         if (data.type === ItemTypeEnum.WEAPON) {
             equipSlot = data.weaponProperties?.twoHanded ? EquipSlotEnum.TWO_HAND : EquipSlotEnum.HAND;
         }
+
+        console.log(data)
 
         const newItem = await WorkshopItem.create({
             account_id: accountId,

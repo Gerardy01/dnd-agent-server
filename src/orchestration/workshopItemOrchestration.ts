@@ -53,7 +53,7 @@ export class WorkshopItemOrchestration implements IWorkshopItemOrchestration {
     }
 
     async deleteItem(workshopItemId: number, accountId: string): Promise<void> {
-        const item = await this.itemService.getOneItem(workshopItemId, accountId);
+        const item = await this.itemService.getOneItem(workshopItemId, accountId, true);
         await this.fileService.deleteFile(item.image ?? "");
         await this.itemService.deleteItem(workshopItemId, accountId);
     }
