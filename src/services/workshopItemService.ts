@@ -156,8 +156,6 @@ export class WorkshopItemService implements IWorkshopItemService {
             equipSlot = data.weaponProperties?.twoHanded ? EquipSlotEnum.TWO_HAND : EquipSlotEnum.HAND;
         }
 
-        console.log(data)
-
         const newItem = await WorkshopItem.create({
             account_id: accountId,
             image: "",
@@ -336,8 +334,6 @@ export class WorkshopItemService implements IWorkshopItemService {
 
     async updateItemImage(workshopItemId: number, accountId: string, image: string): Promise<void> {
         if (!image) return;
-
-        console.log("accountId", accountId, "workshopItemId", workshopItemId, "image", image);
 
         const item = await WorkshopItem.findOne({
             where: {
