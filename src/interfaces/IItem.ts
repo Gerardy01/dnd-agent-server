@@ -23,6 +23,7 @@ export interface CreateItemDTO {
 export interface UpdateItemDTO {
     workshopItemId: number;
     image?: string;
+    isImageUpdated: boolean;
     name: string;
     type: string;
     description: string;

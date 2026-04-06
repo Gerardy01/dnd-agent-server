@@ -18,7 +18,7 @@ export interface IWorkshopItemService {
     getItems(accountId: string): Promise<WorkshopItemDataReturn[]>;
     getOneItem(workshopItemId: number, accountId: string, imageKeyOnly?: boolean): Promise<WorkshopItemDataReturn>;
     createItem(data: CreateItemDTO, accountId: string, transaction?: Transaction): Promise<WorkshopItemDataReturn>;
-    editItem(data: UpdateItemDTO, accountId: string): Promise<WorkshopItemDataReturn>;
+    editItem(data: UpdateItemDTO, accountId: string, transaction?: Transaction): Promise<WorkshopItemDataReturn>;
     deleteItem(workshopItemId: number, accountId: string): Promise<void>;
     updateItemImage(workshopItemId: number, accountId: string, image: string): Promise<void>;
 }
@@ -208,7 +208,7 @@ export class WorkshopItemService implements IWorkshopItemService {
         }
     }
 
-    async editItem(data: UpdateItemDTO, accountId: string): Promise<WorkshopItemDataReturn> {
+    async editItem(data: UpdateItemDTO, accountId: string, transaction?: Transaction): Promise<WorkshopItemDataReturn> {
         const item = await WorkshopItem.findOne({
             where: {
                 workshop_item_id: data.workshopItemId,
@@ -267,7 +267,7 @@ export class WorkshopItemService implements IWorkshopItemService {
         }
 
         await item.update({
-            image: data.image ?? item.image,
+            image: data.isImageUpdated ? data.image : item.image,
             name: data.name,
             type: data.type,
             description: data.description,
@@ -290,7 +290,7 @@ export class WorkshopItemService implements IWorkshopItemService {
             flat_bonus: data.flatBonus ?? null,
             override_bonus: data.overrideBonus ?? null,
             modifier_bonus: data.modifierBonus ?? null,
-        });
+        }, { transaction: transaction ?? null });
 
         return {
             workshopItemId: item.workshop_item_id,

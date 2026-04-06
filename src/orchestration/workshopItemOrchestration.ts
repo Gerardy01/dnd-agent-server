@@ -49,7 +49,29 @@ export class WorkshopItemOrchestration implements IWorkshopItemOrchestration {
     }
 
     async editItem(data: UpdateItemDTO, accountId: string): Promise<WorkshopItemDataReturn> {
-        return await this.itemService.editItem(data, accountId);
+        const transaction = await sequelize.transaction();
+
+        try {
+
+            const targetItem = await this.itemService.getOneItem(data.workshopItemId, accountId, true);
+            const updatedItem = await this.itemService.editItem(data, accountId, transaction);
+
+            const imageKey = await this.fileService.moveTempFileToFinalLocation(
+                data.image && data.isImageUpdated ? data.image : "",
+                `user/uploads/workshop/item/${updatedItem.workshopItemId}-${accountId}-${Date.now()}`
+            );
+            await this.fileService.deleteFile(targetItem.image && data.isImageUpdated ? targetItem.image : "");
+
+            await transaction.commit();
+
+            await this.itemService.updateItemImage(updatedItem.workshopItemId, accountId, imageKey);
+
+            return updatedItem;
+
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
     }
 
     async deleteItem(workshopItemId: number, accountId: string): Promise<void> {

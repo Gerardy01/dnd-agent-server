@@ -88,6 +88,7 @@ export const CreateWorkshopItemSchema = z.object({
 export const UpdateWorkshopItemSchema = z.object({
     workshopItemId: z.number().int().positive(),
     image: z.string().optional(),
+    isImageUpdated: z.boolean(),
     name: z.string().min(1).max(100),
     type: z.string().min(1),
     description: z.string().min(1).max(500),
