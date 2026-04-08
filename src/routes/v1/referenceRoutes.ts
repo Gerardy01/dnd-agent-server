@@ -20,4 +20,10 @@ referenceRoutes.get(
     ReferenceController.getEffectOptions,
 );
 
+referenceRoutes.get(
+    '/feat-options',
+    authenticate,
+    ReferenceController.getFeatOptions,
+);
+
 export default referenceRoutes;

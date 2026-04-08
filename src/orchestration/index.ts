@@ -3,6 +3,7 @@ import { AuthOrchestration } from "@/orchestration/authOrchestration";
 import { AccountOrchestration } from "@/orchestration/accountOrchestration";
 import { NotificationOrchestration } from "@/orchestration/notificationOrchestration";
 import { WorkshopItemOrchestration } from "@/orchestration/workshopItemOrchestration";
+import { WorkshopFeatOrchestration } from "@/orchestration/workshopFeatOrchestration";
 import { ReferenceOrchestration } from "@/orchestration/referenceOrchestration";
 import { FileOrchestration } from "@/orchestration/fileOrchestration";
 
@@ -12,6 +13,7 @@ import {
     accountService,
     notificationService,
     workshopItemService,
+    workshopFeatService,
     referenceService,
     fileService,
 } from "@/services";
@@ -39,6 +41,10 @@ export const notificationOrchestration = new NotificationOrchestration(
 );
 export const itemOrchestration = new WorkshopItemOrchestration(
     workshopItemService,
+    fileService,
+);
+export const featOrchestration = new WorkshopFeatOrchestration(
+    workshopFeatService,
     fileService,
 );
 export const referenceOrchestration = new ReferenceOrchestration(

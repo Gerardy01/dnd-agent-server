@@ -14,12 +14,16 @@ import {
     DAMAGE_TYPES,
     IMMUNITIES
 } from '@/constants/effect';
+import {
+    FEAT_CATEGORY
+} from '@/constants/feat';
 
 // interfaces
-import { ItemOptionsReturn, EffectOptionsReturn } from '@/interfaces/IReference';
+import { ItemOptionsReturn, EffectOptionsReturn, FeatOptionsReturn } from '@/interfaces/IReference';
 export interface IReferenceService {
     getItemOptions(): Promise<ItemOptionsReturn>;
     getEffectOptions(): Promise<EffectOptionsReturn>;
+    getFeatOptions(): Promise<FeatOptionsReturn>;
 }
 
 export class ReferenceService implements IReferenceService {
@@ -42,6 +46,12 @@ export class ReferenceService implements IReferenceService {
         return {
             damageTypes: DAMAGE_TYPES,
             immunities: IMMUNITIES,
+        };
+    }
+
+    async getFeatOptions(): Promise<FeatOptionsReturn> {
+        return {
+            featCategories: FEAT_CATEGORY,
         };
     }
 }

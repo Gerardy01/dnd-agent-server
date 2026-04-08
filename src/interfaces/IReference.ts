@@ -16,3 +16,7 @@ export type EffectOptionsReturn = {
     damageTypes: readonly string[];
     immunities: readonly string[];
 }
+
+export type FeatOptionsReturn = {
+    featCategories: readonly string[];
+}

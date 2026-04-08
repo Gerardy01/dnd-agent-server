@@ -59,3 +59,5 @@ WorkshopFeat.init({
     timestamps: true,
     underscored: true,
 });
+
+export default WorkshopFeat;

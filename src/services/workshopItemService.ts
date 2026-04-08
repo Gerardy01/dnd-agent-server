@@ -1,7 +1,7 @@
 import { Transaction } from "sequelize";
 
 // models
-import WorkshopItem from "@/models/workshopItem.model";
+import { WorkshopItem } from "@/models";
 
 // exceptions
 import { WrongFormat, DataNotFound } from "@/utils/exceptions";
