@@ -3,6 +3,7 @@ import RefreshToken from "@/models/refreshToken.model";
 import OtpAuth from "@/models/otpAuth.model";
 import WorkshopItem from "@/models/workshopItem.model";
 import WorkshopFeat from "@/models/workshopFeat.model";
+import WorkshopSpell from "@/models/workshopSpell.model";
 
 export {
     Account,
@@ -10,4 +11,5 @@ export {
     OtpAuth,
     WorkshopItem,
     WorkshopFeat,
+    WorkshopSpell,
 }

@@ -20,3 +20,8 @@ export type EffectOptionsReturn = {
 export type FeatOptionsReturn = {
     featCategories: readonly string[];
 }
+
+export type SpellOptionsReturn = {
+    spellSchools: readonly string[];
+    savingThrowStats: readonly string[];
+}

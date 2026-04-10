@@ -4,6 +4,7 @@ import { AccountOrchestration } from "@/orchestration/accountOrchestration";
 import { NotificationOrchestration } from "@/orchestration/notificationOrchestration";
 import { WorkshopItemOrchestration } from "@/orchestration/workshopItemOrchestration";
 import { WorkshopFeatOrchestration } from "@/orchestration/workshopFeatOrchestration";
+import { WorkshopSpellOrchestration } from "@/orchestration/workshopSpellOrchestration";
 import { ReferenceOrchestration } from "@/orchestration/referenceOrchestration";
 import { FileOrchestration } from "@/orchestration/fileOrchestration";
 
@@ -14,6 +15,7 @@ import {
     notificationService,
     workshopItemService,
     workshopFeatService,
+    workshopSpellService,
     referenceService,
     fileService,
 } from "@/services";
@@ -45,6 +47,10 @@ export const itemOrchestration = new WorkshopItemOrchestration(
 );
 export const featOrchestration = new WorkshopFeatOrchestration(
     workshopFeatService,
+    fileService,
+);
+export const spellOrchestration = new WorkshopSpellOrchestration(
+    workshopSpellService,
     fileService,
 );
 export const referenceOrchestration = new ReferenceOrchestration(

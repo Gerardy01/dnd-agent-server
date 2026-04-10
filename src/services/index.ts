@@ -4,6 +4,7 @@ import { AuthService } from "@/services/authService";
 import { NotificationService } from "@/services/notificationService";
 import { WorkshopItemService } from "@/services/workshopItemService";
 import { WorkshopFeatService } from "@/services/workshopFeatService";
+import { WorkshopSpellService } from "@/services/workshopSpellService";
 import { ReferenceService } from "@/services/referenceService";
 import { FileService } from "@/services/fileService";
 
@@ -33,5 +34,6 @@ export const notificationService = new NotificationService(
 );
 export const workshopItemService = new WorkshopItemService();
 export const workshopFeatService = new WorkshopFeatService();
+export const workshopSpellService = new WorkshopSpellService();
 export const referenceService = new ReferenceService();
 export const fileService = new FileService(cloudflareR2StorageProvider);

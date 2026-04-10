@@ -1,12 +1,13 @@
 import { IReferenceService } from "@/services/referenceService";
 
 // interfaces
-import { ItemOptionsReturn, EffectOptionsReturn, FeatOptionsReturn } from "@/interfaces/IReference";
+import { ItemOptionsReturn, EffectOptionsReturn, FeatOptionsReturn, SpellOptionsReturn } from "@/interfaces/IReference";
 
 export interface IReferenceOrchestration {
     getItemOptions(): Promise<ItemOptionsReturn>;
     getEffectOptions(): Promise<EffectOptionsReturn>;
     getFeatOptions(): Promise<FeatOptionsReturn>;
+    getSpellOptions(): Promise<SpellOptionsReturn>;
 }
 
 export class ReferenceOrchestration implements IReferenceOrchestration {
@@ -24,5 +25,9 @@ export class ReferenceOrchestration implements IReferenceOrchestration {
 
     async getFeatOptions() {
         return await this.referenceService.getFeatOptions();
+    }
+
+    async getSpellOptions() {
+        return await this.referenceService.getSpellOptions();
     }
 }

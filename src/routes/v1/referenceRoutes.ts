@@ -26,4 +26,10 @@ referenceRoutes.get(
     ReferenceController.getFeatOptions,
 );
 
+referenceRoutes.get(
+    '/spell-options',
+    authenticate,
+    ReferenceController.getSpellOptions,
+);
+
 export default referenceRoutes;

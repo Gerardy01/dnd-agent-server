@@ -17,13 +17,18 @@ import {
 import {
     FEAT_CATEGORY
 } from '@/constants/feat';
+import {
+    SPELL_SCHOOL,
+    SAVING_THROW_STAT
+} from '@/constants/spell';
 
 // interfaces
-import { ItemOptionsReturn, EffectOptionsReturn, FeatOptionsReturn } from '@/interfaces/IReference';
+import { ItemOptionsReturn, EffectOptionsReturn, FeatOptionsReturn, SpellOptionsReturn } from '@/interfaces/IReference';
 export interface IReferenceService {
     getItemOptions(): Promise<ItemOptionsReturn>;
     getEffectOptions(): Promise<EffectOptionsReturn>;
     getFeatOptions(): Promise<FeatOptionsReturn>;
+    getSpellOptions(): Promise<SpellOptionsReturn>;
 }
 
 export class ReferenceService implements IReferenceService {
@@ -52,6 +57,13 @@ export class ReferenceService implements IReferenceService {
     async getFeatOptions(): Promise<FeatOptionsReturn> {
         return {
             featCategories: FEAT_CATEGORY,
+        };
+    }
+
+    async getSpellOptions(): Promise<SpellOptionsReturn> {
+        return {
+            spellSchools: SPELL_SCHOOL,
+            savingThrowStats: SAVING_THROW_STAT,
         };
     }
 }
