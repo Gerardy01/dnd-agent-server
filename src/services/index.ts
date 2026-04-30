@@ -17,6 +17,7 @@ import {
     cryptoCryptProvider,
     nodeMailerEmailProvider,
     cloudflareR2StorageProvider,
+    googleOauthProvider,
 } from "@/provider";
 
 // services init
@@ -28,6 +29,7 @@ export const authService = new AuthService(
     inMemoryEventPublisher,
     jwtProvider,
     cryptoCryptProvider,
+    googleOauthProvider,
 );
 export const notificationService = new NotificationService(
     nodeMailerEmailProvider,

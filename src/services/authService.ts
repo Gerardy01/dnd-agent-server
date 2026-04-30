@@ -15,11 +15,15 @@ import { AccessTokenBody, GenerateAccessTokenDTO, GenerateOtpDTO, GenerateResetP
 import { IEventPublisherProvider } from "@/provider/eventPublisherProvider";
 import { IJwtProvider } from "@/provider/jwtProvider";
 import { ICryptProvider } from "@/provider/cryptProvider";
+import { IGoogleOauthProvider } from "@/provider/googleOauthProvider";
+
 export interface IAuthService {
     generateOtp(data: GenerateOtpDTO, skipColldown?: boolean): Promise<void>;
     generateVerificationToken(email: string): Promise<string>;
     generateResetPassToken(data: GenerateResetPassTokenDTO): Promise<string>;
     verifyOtp(data: VerifyOtpDTO): Promise<string>;
+    verifyGoogleCode(code: string): Promise<string>;
+    getGoogleAuthUrl(): string;
     generateAccessToken(data: GenerateAccessTokenDTO): Promise<string>;
     generateRefreshToken(accountId: string, transaction?: Transaction): Promise<string>;
     getVaildRefreshSession(identifier: string): Promise<RefreshSessionReturn>;
@@ -33,7 +37,16 @@ export class AuthService implements IAuthService {
         private eventPublisherProvider: IEventPublisherProvider,
         private jwtProvider: IJwtProvider,
         private cryptProvider: ICryptProvider,
+        private googleOauthProvider: IGoogleOauthProvider,
     ) { }
+
+    async verifyGoogleCode(code: string): Promise<string> {
+        return await this.googleOauthProvider.verifyCodeAndGetEmail(code);
+    }
+
+    getGoogleAuthUrl(): string {
+        return this.googleOauthProvider.generateAuthUrl();
+    }
 
     async generateOtp(data: GenerateOtpDTO, skipColldown = false): Promise<void> {
         const expiredSec = data.expiredSec ?? Number(process.env.OTP_EXPIRED_SEC) ?? 300;
@@ -84,6 +97,9 @@ export class AuthService implements IAuthService {
             send_to: data.address,
             expires_at: expiresAt,
         });
+
+        // TODO : Remove on deployment
+        console.log("Otp is: ", code)
 
         // broadcast otp generated event
         await this.eventPublisherProvider.publish({

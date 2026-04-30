@@ -4,10 +4,14 @@ import sequelize from '@/config/database';
 import { IAccountService } from "@/services/accountService";
 import { IAuthService } from "@/services/authService";
 import { LoginDataReturn, LoginDTO, VerifyOtpDTO, VerifyOtpReturn } from "@/interfaces/IAuth";
+import { DataNotFound } from "@/utils/exceptions";
+import crypto from "crypto";
 export interface IAuthOrchestration {
     generateNewOtp(email: string): Promise<void>;
     otpVerification(data: VerifyOtpDTO): Promise<VerifyOtpReturn>;
     login(data: LoginDTO): Promise<LoginDataReturn>;
+    googleLogin(code: string): Promise<VerifyOtpReturn>;
+    getGoogleAuthUrl(): string;
     getNewAccessToken(identifier: string): Promise<string>;
     logout(identifier: string): Promise<void>;
 }
@@ -75,6 +79,57 @@ export class AuthOrchestration implements IAuthOrchestration {
 
         return {
             verificationToken,
+        }
+    }
+
+    getGoogleAuthUrl(): string {
+        return this.authService.getGoogleAuthUrl();
+    }
+
+    async googleLogin(code: string): Promise<VerifyOtpReturn> {
+        const transaction = await sequelize.transaction();
+
+        try {
+            // Verify code and get email from Google
+            const email = await this.authService.verifyGoogleCode(code);
+
+            // Try to find the existing account, or create a new one
+            let account;
+            try {
+                account = await this.accountService.getAccountByEmail(email);
+            } catch (error) {
+                if (error instanceof DataNotFound) {
+                    // Create a new account with a random secure password
+                    const randomPassword = crypto.randomBytes(16).toString('hex');
+                    account = await this.accountService.createAccount({
+                        email: email,
+                        password: randomPassword
+                    });
+                } else {
+                    throw error;
+                }
+            }
+
+            // Generate access token
+            const accessToken = await this.authService.generateAccessToken({
+                accountId: account.accountId,
+                username: account.username,
+                email: account.email,
+            });
+
+            // Generate refresh token
+            const refreshToken = await this.authService.generateRefreshToken(account.accountId, transaction);
+
+            await transaction.commit();
+
+            return {
+                accessToken,
+                refreshToken,
+            };
+
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
         }
     }
 

@@ -1,7 +1,6 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 
-// types
-import { GenerateAccessTokenDTO, GenerateResetPassTokenDTO, GenerateVerificationTokenDTO } from "@/interfaces/IAuth";
+// types and interfaces
 export interface IJwtProvider {
     generateToken<T extends object>(payload: T, secret: string, expiresIn: NonNullable<SignOptions['expiresIn']>): Promise<string>;
     validateToken<T>(token: string, secret: string): Promise<T | null>;

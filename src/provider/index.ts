@@ -6,6 +6,7 @@ import { JwtProvider } from "@/provider/jwtProvider";
 import { CryptoCryptProvider } from "@/provider/cryptProvider";
 import { NodemailerEmailProvider } from "@/provider/emailProvider";
 import { CloudflareR2StorageProvider } from "@/provider/storageProvider";
+import { GoogleOauthProvider } from "@/provider/googleOauthProvider";
 
 
 
@@ -17,3 +18,4 @@ export const jwtProvider = new JwtProvider();
 export const cryptoCryptProvider = new CryptoCryptProvider();
 export const nodeMailerEmailProvider = new NodemailerEmailProvider();
 export const cloudflareR2StorageProvider = new CloudflareR2StorageProvider();
+export const googleOauthProvider = new GoogleOauthProvider();

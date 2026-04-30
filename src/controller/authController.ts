@@ -138,6 +138,35 @@ class AuthController {
         }
     }
 
+    static async getGoogleAuthUrl(req: Request, res: Response) {
+        const url = authOrchestration.getGoogleAuthUrl();
+        return res.redirect(url);
+    }
+
+    static async googleCallback(req: Request, res: Response) {
+        try {
+            const code = req.query.code as string || "";
+
+            const result = await authOrchestration.googleLogin(code);
+
+            res.cookie('refreshToken', result.refreshToken, {
+                httpOnly: true,
+                // secure: true,
+                secure: false,
+                maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days in milliseconds (following token expiry time)
+                // sameSite: 'none',
+                sameSite: 'lax',
+            });
+
+            const clientUrl = process.env.CLIENT_URL;
+            return res.redirect(`${clientUrl}/dashboard`);
+
+        } catch (e) {
+            const clientUrl = process.env.CLIENT_URL;
+            return res.redirect(`${clientUrl}/login?error=google_auth_failed`);
+        }
+    }
+
     static async getNewAccessToken(req: Request, res: Response) {
 
         try {

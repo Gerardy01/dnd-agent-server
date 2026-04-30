@@ -15,6 +15,14 @@ authRoutes.get(
     '/token',
     AuthController.getNewAccessToken,
 );
+authRoutes.get(
+    '/google/login',
+    AuthController.getGoogleAuthUrl
+);
+authRoutes.get(
+    '/google/callback',
+    AuthController.googleCallback
+);
 authRoutes.post(
     '/login',
     validateRequest(LoginSchema),
