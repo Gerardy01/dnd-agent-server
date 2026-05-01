@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { rateLimit } from 'express-rate-limit';
 
 // services
 import { authService } from '@/services';
@@ -63,3 +64,14 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     }
 
 }
+export const apiRateLimiter = rateLimit({
+    windowMs: 1000, // 1 second
+    limit: 20, // limit each IP to 20 requests per second
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: {
+        status: "failed",
+        message: "Too many requests from this IP, please try again after a second",
+        userMessage: "",
+    }
+});

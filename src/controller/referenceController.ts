@@ -97,6 +97,29 @@ class ReferenceController {
         }
     }
 
+    static async getMonsterOptions(req: Request, res: Response) {
+
+        try {
+
+            const data = await referenceOrchestration.getMonsterOptions();
+
+            return res.status(200).json({
+                "status": "success",
+                "message": "Monster options fetched successfully",
+                "userMessage": "",
+                "data": data
+            });
+        } catch (e) {
+
+            return res.status(500).json({
+                "status": "failed",
+                "message": "Internal server error",
+                "userMessage": "500",
+                "errors": e
+            });
+        }
+    }
+
 }
 
 export default ReferenceController;

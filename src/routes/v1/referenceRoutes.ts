@@ -32,4 +32,10 @@ referenceRoutes.get(
     ReferenceController.getSpellOptions,
 );
 
+referenceRoutes.get(
+    '/monster-options',
+    authenticate,
+    ReferenceController.getMonsterOptions,
+);
+
 export default referenceRoutes;

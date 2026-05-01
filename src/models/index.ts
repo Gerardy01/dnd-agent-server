@@ -4,6 +4,8 @@ import OtpAuth from "@/models/otpAuth.model";
 import WorkshopItem from "@/models/workshopItem.model";
 import WorkshopFeat from "@/models/workshopFeat.model";
 import WorkshopSpell from "@/models/workshopSpell.model";
+import WorkshopFaction from "@/models/workshopFaction.model";
+import WorkshopMonster from "@/models/workshopMonster.model";
 
 export {
     Account,
@@ -12,4 +14,6 @@ export {
     WorkshopItem,
     WorkshopFeat,
     WorkshopSpell,
+    WorkshopFaction,
+    WorkshopMonster,
 }

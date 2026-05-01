@@ -6,6 +6,8 @@ import accountRoutes from '@/routes/v1/accountRoutes';
 import workshopItemRoutes from './workshopItemRoutes';
 import workshopFeatRoutes from './workshopFeatRoutes';
 import workshopSpellRoutes from './workshopSpellRoutes';
+import workshopFactionRoutes from './workshopFactionRoutes';
+import workshopMonsterRoutes from './workshopMonsterRoutes';
 import referenceRoutes from '@/routes/v1/referenceRoutes';
 import fileRoutes from '@/routes/v1/fileRoutes';
 
@@ -16,6 +18,8 @@ v1Api.use("/account", accountRoutes);
 v1Api.use("/workshop-item", workshopItemRoutes);
 v1Api.use("/workshop-feat", workshopFeatRoutes);
 v1Api.use("/workshop-spell", workshopSpellRoutes);
+v1Api.use("/workshop-faction", workshopFactionRoutes);
+v1Api.use("/workshop-monster", workshopMonsterRoutes);
 v1Api.use("/reference", referenceRoutes);
 v1Api.use("/file", fileRoutes);
 

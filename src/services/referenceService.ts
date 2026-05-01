@@ -21,14 +21,28 @@ import {
     SPELL_SCHOOL,
     SAVING_THROW_STAT
 } from '@/constants/spell';
+import {
+    MONSTER_SIZE,
+    MONSTER_TYPE,
+    ALIGNMENT,
+    MOVEMENT_SELECTION,
+    SENSES_SELECTION
+} from '@/constants/monster';
 
 // interfaces
-import { ItemOptionsReturn, EffectOptionsReturn, FeatOptionsReturn, SpellOptionsReturn } from '@/interfaces/IReference';
+import { 
+    ItemOptionsReturn, 
+    EffectOptionsReturn, 
+    FeatOptionsReturn, 
+    SpellOptionsReturn,
+    MonsterOptionsReturn
+} from '@/interfaces/IReference';
 export interface IReferenceService {
     getItemOptions(): Promise<ItemOptionsReturn>;
     getEffectOptions(): Promise<EffectOptionsReturn>;
     getFeatOptions(): Promise<FeatOptionsReturn>;
     getSpellOptions(): Promise<SpellOptionsReturn>;
+    getMonsterOptions(): Promise<MonsterOptionsReturn>;
 }
 
 export class ReferenceService implements IReferenceService {
@@ -64,6 +78,16 @@ export class ReferenceService implements IReferenceService {
         return {
             spellSchools: SPELL_SCHOOL,
             savingThrowStats: SAVING_THROW_STAT,
+        };
+    }
+
+    async getMonsterOptions(): Promise<MonsterOptionsReturn> {
+        return {
+            monsterSize: MONSTER_SIZE,
+            monsterType: MONSTER_TYPE,
+            alignment: ALIGNMENT,
+            movementSelection: MOVEMENT_SELECTION,
+            sensesSelection: SENSES_SELECTION,
         };
     }
 }

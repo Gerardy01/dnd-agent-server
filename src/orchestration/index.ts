@@ -5,6 +5,8 @@ import { NotificationOrchestration } from "@/orchestration/notificationOrchestra
 import { WorkshopItemOrchestration } from "@/orchestration/workshopItemOrchestration";
 import { WorkshopFeatOrchestration } from "@/orchestration/workshopFeatOrchestration";
 import { WorkshopSpellOrchestration } from "@/orchestration/workshopSpellOrchestration";
+import { WorkshopFactionOrchestration } from "@/orchestration/workshopFactionOrchestration";
+import { WorkshopMonsterOrchestration } from "@/orchestration/workshopMonsterOrchestration";
 import { ReferenceOrchestration } from "@/orchestration/referenceOrchestration";
 import { FileOrchestration } from "@/orchestration/fileOrchestration";
 
@@ -16,6 +18,8 @@ import {
     workshopItemService,
     workshopFeatService,
     workshopSpellService,
+    workshopFactionService,
+    workshopMonsterService,
     referenceService,
     fileService,
 } from "@/services";
@@ -53,9 +57,13 @@ export const spellOrchestration = new WorkshopSpellOrchestration(
     workshopSpellService,
     fileService,
 );
+export const factionOrchestration = new WorkshopFactionOrchestration(
+    workshopFactionService,
+    fileService,
+);
 export const referenceOrchestration = new ReferenceOrchestration(
     referenceService,
 );
 export const fileOrchestration = new FileOrchestration(
     fileService,
-);
+);export const monsterOrchestration = new WorkshopMonsterOrchestration(workshopMonsterService, fileService);

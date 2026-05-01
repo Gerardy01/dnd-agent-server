@@ -25,3 +25,10 @@ export type SpellOptionsReturn = {
     spellSchools: readonly string[];
     savingThrowStats: readonly string[];
 }
+export type MonsterOptionsReturn = {
+    monsterSize: readonly string[];
+    monsterType: readonly string[];
+    alignment: readonly string[];
+    movementSelection: readonly string[];
+    sensesSelection: readonly string[];
+}

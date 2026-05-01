@@ -5,6 +5,8 @@ import { NotificationService } from "@/services/notificationService";
 import { WorkshopItemService } from "@/services/workshopItemService";
 import { WorkshopFeatService } from "@/services/workshopFeatService";
 import { WorkshopSpellService } from "@/services/workshopSpellService";
+import { WorkshopFactionService } from "@/services/workshopFactionService";
+import { WorkshopMonsterService } from "@/services/workshopMonsterService";
 import { ReferenceService } from "@/services/referenceService";
 import { FileService } from "@/services/fileService";
 
@@ -37,5 +39,6 @@ export const notificationService = new NotificationService(
 export const workshopItemService = new WorkshopItemService();
 export const workshopFeatService = new WorkshopFeatService();
 export const workshopSpellService = new WorkshopSpellService();
+export const workshopFactionService = new WorkshopFactionService();
 export const referenceService = new ReferenceService();
-export const fileService = new FileService(cloudflareR2StorageProvider);
+export const fileService = new FileService(cloudflareR2StorageProvider);export const workshopMonsterService = new WorkshopMonsterService();
