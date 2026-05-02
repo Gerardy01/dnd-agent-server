@@ -98,8 +98,8 @@ export class WorkshopMonsterService implements IWorkshopMonsterService {
             speed: data.speed,
             senses: data.senses,
             stats: {
-                min_hp: data.stats.minHp,
-                max_hp: data.stats.maxHp,
+                minHp: data.stats.minHp,
+                maxHp: data.stats.maxHp,
                 ac: data.stats.ac,
                 cr: data.stats.cr,
                 str: data.stats.str,
@@ -162,8 +162,8 @@ export class WorkshopMonsterService implements IWorkshopMonsterService {
             speed: data.speed,
             senses: data.senses,
             stats: {
-                min_hp: data.stats.minHp,
-                max_hp: data.stats.maxHp,
+                minHp: data.stats.minHp,
+                maxHp: data.stats.maxHp,
                 ac: data.stats.ac,
                 cr: data.stats.cr,
                 str: data.stats.str,

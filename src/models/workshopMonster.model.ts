@@ -100,8 +100,8 @@ WorkshopMonster.init({
         type: DataTypes.JSONB,
         allowNull: false,
         defaultValue: {
-            min_hp: 0,
-            max_hp: 0,
+            minHp: 0,
+            maxHp: 0,
             ac: 10,
             cr: 0,
             str: 10,
