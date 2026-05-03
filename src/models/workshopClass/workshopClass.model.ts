@@ -1,26 +1,28 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "@/config/database";
 
-// models
-import Account from "@/models/account.model";
+// interfaces
+import { Features, SpellcastingProperties } from "@/interfaces/IClass";
 
-class WorkshopSpell extends Model {
-    declare public workshop_spell_id: number;
+// models
+import Account from "@/models/account/account.model";
+
+class WorkshopClass extends Model {
+    declare public workshop_class_id: number;
     declare public account_id: string;
-    declare public image: string | null;
     declare public name: string;
+    declare public image: string;
     declare public description: string;
-    declare public level: number;
-    declare public range: number;
-    declare public school: string;
-    declare public attack_properties: Record<string, any> | null;
-    declare public spell_save_properties: Record<string, any> | null;
+    declare public hit_die: string;
+    declare public subclass_level: number;
+    declare public spellcasting_properties: SpellcastingProperties | null;
+    declare public features: Features[];
     declare public readonly createdAt: Date;
     declare public readonly updatedAt: Date;
 }
 
-WorkshopSpell.init({
-    workshop_spell_id: {
+WorkshopClass.init({
+    workshop_class_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
@@ -33,7 +35,7 @@ WorkshopSpell.init({
             model: Account,
             key: 'account_id',
         },
-        onDelete: 'CASCADE',
+        onDelete: 'CASCADE'
     },
     image: {
         type: DataTypes.STRING(100),
@@ -47,32 +49,29 @@ WorkshopSpell.init({
         type: DataTypes.TEXT,
         allowNull: false,
     },
-    level: {
+    hit_die: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+    },
+    subclass_level: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    range: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
-    school: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    attack_properties: {
+    spellcasting_properties: {
         type: DataTypes.JSONB,
         allowNull: true,
     },
-    spell_save_properties: {
+    features: {
         type: DataTypes.JSONB,
-        allowNull: true,
+        allowNull: false,
+        defaultValue: [],
     },
 }, {
     sequelize,
-    modelName: 'WorkshopSpell',
-    tableName: 'workshop_spells',
+    modelName: 'WorkshopClass',
+    tableName: 'workshop_classes',
     timestamps: true,
     underscored: true,
 });
 
-export default WorkshopSpell;
+export default WorkshopClass;

@@ -5,7 +5,7 @@ import sequelize from "@/config/database";
 import { AdditionalProperties, ArmorProperties, ItemBonus, ModifierBonus, WeaponProperties } from "@/interfaces/IItem";
 
 // models
-import Account from "@/models/account.model";
+import Account from "@/models/account/account.model";
 
 class WorkshopItem extends Model {
     declare public workshop_item_id: number;

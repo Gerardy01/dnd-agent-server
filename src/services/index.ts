@@ -9,6 +9,7 @@ import { WorkshopFactionService } from "@/services/workshopFactionService";
 import { WorkshopMonsterService } from "@/services/workshopMonsterService";
 import { ReferenceService } from "@/services/referenceService";
 import { FileService } from "@/services/fileService";
+import { WorkshopClassService } from "@/services/workshopClassService";
 
 // providers
 import {
@@ -41,4 +42,6 @@ export const workshopFeatService = new WorkshopFeatService();
 export const workshopSpellService = new WorkshopSpellService();
 export const workshopFactionService = new WorkshopFactionService();
 export const referenceService = new ReferenceService();
-export const fileService = new FileService(cloudflareR2StorageProvider);export const workshopMonsterService = new WorkshopMonsterService();
+export const fileService = new FileService(cloudflareR2StorageProvider);
+export const workshopMonsterService = new WorkshopMonsterService();
+export const workshopClassService = new WorkshopClassService();

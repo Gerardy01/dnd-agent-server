@@ -2,7 +2,7 @@ import { Model, DataTypes } from "sequelize";
 import sequelize from "@/config/database";
 
 // models
-import Account from "@/models/account.model";
+import Account from "@/models/account/account.model";
 
 // interfaces
 import { MonsterAction, MonsterSenses, MonsterSpeed, MonsterStats, AdditionalProperties } from "@/interfaces/IMonster";

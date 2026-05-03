@@ -16,6 +16,7 @@ export interface IWorkshopSpellService {
     editSpell(data: UpdateSpellDTO, accountId: string, transaction?: Transaction): Promise<WorkshopSpellDataReturn>;
     deleteSpell(workshopSpellId: number, accountId: string): Promise<void>;
     updateSpellImage(workshopSpellId: number, accountId: string, image: string): Promise<void>;
+    getWorkshopSpellsByIds(spellIds: number[], accountId: string): Promise<WorkshopSpellDataReturn[]>;
 }
 
 export class WorkshopSpellService implements IWorkshopSpellService {
@@ -170,5 +171,36 @@ export class WorkshopSpellService implements IWorkshopSpellService {
         }
 
         await spell.update({ image });
+    }
+
+    async getWorkshopSpellsByIds(spellIds: number[], accountId: string): Promise<WorkshopSpellDataReturn[]> {
+        const uniqueSpellIds = [...new Set(spellIds)];
+        const spells = await WorkshopSpell.findAll({
+            where: {
+                workshop_spell_id: uniqueSpellIds,
+                account_id: accountId,
+            },
+        });
+
+        const notFoundIds = uniqueSpellIds.filter(id => !spells.some(spell => spell.workshop_spell_id === id));
+        if (notFoundIds.length > 0) {
+            throw new DataNotFound(`Spell with id ${notFoundIds.join(', ')} not found`);
+        }
+
+        const imageBaseUrl = process.env.FILE_PUBLIC_URL || "";
+
+        return spells.map(spell => ({
+            workshopSpellId: spell.workshop_spell_id,
+            accountId: spell.account_id,
+            image: spell.image ? `${imageBaseUrl}/${spell.image}` : "",
+            name: spell.name,
+            description: spell.description,
+            level: spell.level,
+            range: spell.range,
+            school: spell.school,
+            attackProperties: spell.attack_properties as AttackProperties | null,
+            spellSaveProperties: spell.spell_save_properties as SpellSaveProperties | null,
+            createdAt: spell.createdAt,
+        }));
     }
 }

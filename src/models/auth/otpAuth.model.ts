@@ -1,5 +1,5 @@
 import { Sequelize, DataType, Model, DataTypes } from "sequelize";
-import sequelize from "../config/database";
+import sequelize from "@/config/database";
 
 class OtpAuth extends Model {
     declare public id: number;

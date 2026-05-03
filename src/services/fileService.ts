@@ -8,7 +8,9 @@ import { GetUploadUrlDTO, GetUploadUrlReturn } from "@/interfaces/IFile";
 export interface IFileService {
     getUploadUrl(data: GetUploadUrlDTO, accountId: string): Promise<GetUploadUrlReturn>;
     moveTempFileToFinalLocation(tempKey: string, finalKey: string): Promise<string>;
+    moveTempFileToFinalLocationBulk(files: { sourceKey: string; destinationKey: string }[]): Promise<string[]>;
     deleteFile(key: string): Promise<void>;
+    deleteFilesBulk(keys: string[]): Promise<void>;
 }
 
 
@@ -45,8 +47,22 @@ export class FileService implements IFileService {
         return finalKey;
     }
 
+    async moveTempFileToFinalLocationBulk(files: { sourceKey: string; destinationKey: string }[]): Promise<string[]> {
+        if (files.length === 0) return [];
+
+        await this.storageProvider.copyFilesBulk(files);
+        await this.storageProvider.deleteFilesBulk(files.map((file) => file.sourceKey));
+
+        return files.map((file) => file.destinationKey);
+    }
+
     async deleteFile(key: string): Promise<void> {
         if (!key) return;
         await this.storageProvider.deleteFile(key);
+    }
+
+    async deleteFilesBulk(keys: string[]): Promise<void> {
+        if (keys.length === 0) return;
+        await this.storageProvider.deleteFilesBulk(keys);
     }
 }

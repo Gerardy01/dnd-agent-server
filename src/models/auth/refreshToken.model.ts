@@ -1,8 +1,8 @@
 import { Sequelize, DataType, Model, DataTypes } from "sequelize";
-import sequelize from "../config/database";
+import sequelize from "@/config/database";
 
 // models
-import Account from "@/models/account.model";
+import Account from "@/models/account/account.model";
 
 class RefreshToken extends Model {
     declare public id: number;

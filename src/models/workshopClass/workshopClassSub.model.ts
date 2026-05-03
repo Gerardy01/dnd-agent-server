@@ -1,34 +1,34 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "@/config/database";
 
-// models
-import Account from "@/models/account.model";
+import { Features, SpellcastingProperties } from "@/interfaces/IClass";
+import WorkshopClass from "@/models/workshopClass/workshopClass.model";
 
-class WorkshopFeat extends Model {
-    declare public workshop_feat_id: number;
-    declare public account_id: string;
+class WorkshopClassSub extends Model {
+    declare public id: number;
+    declare public workshop_class_id: number;
     declare public image: string;
     declare public name: string;
     declare public description: string;
-    declare public category: string;
-    declare public min_level: number | null;
+    declare public spellcasting_properties: SpellcastingProperties | null;
+    declare public features: Features[];
     declare public readonly createdAt: Date;
     declare public readonly updatedAt: Date;
 }
 
-WorkshopFeat.init({
-    workshop_feat_id: {
+WorkshopClassSub.init({
+    id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false,
     },
-    account_id: {
-        type: DataTypes.UUIDV4,
+    workshop_class_id: {
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: Account,
-            key: 'account_id',
+            model: WorkshopClass,
+            key: 'workshop_class_id',
         },
         onDelete: 'CASCADE'
     },
@@ -44,20 +44,21 @@ WorkshopFeat.init({
         type: DataTypes.TEXT,
         allowNull: false,
     },
-    category: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    min_level: {
-        type: DataTypes.INTEGER,
+    spellcasting_properties: {
+        type: DataTypes.JSONB,
         allowNull: true,
+    },
+    features: {
+        type: DataTypes.JSONB,
+        allowNull: false,
+        defaultValue: [],
     },
 }, {
     sequelize,
-    modelName: "WorkshopFeat",
-    tableName: "workshop_feats",
+    modelName: 'WorkshopClassSub',
+    tableName: 'workshop_class_subs',
     timestamps: true,
     underscored: true,
 });
 
-export default WorkshopFeat;
+export default WorkshopClassSub;

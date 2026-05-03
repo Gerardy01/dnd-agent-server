@@ -159,7 +159,7 @@ class AuthController {
             });
 
             const clientUrl = process.env.CLIENT_URL;
-            return res.redirect(`${clientUrl}/dashboard`);
+            return res.redirect(`${clientUrl}/`);
 
         } catch (e) {
             const clientUrl = process.env.CLIENT_URL;
