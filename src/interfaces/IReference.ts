@@ -39,4 +39,5 @@ export type ClassOptionsReturn = {
     spellcastingType: readonly string[];
     diceSelection: readonly string[];
     classFeatureType: readonly string[];
+    resourceRecoveryType: readonly string[];
 }

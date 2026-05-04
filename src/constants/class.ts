@@ -31,3 +31,9 @@ export const CLASS_FEATURE_TYPE = [
     "passive"
 ] as const;
 export type ClassFeatureType = typeof CLASS_FEATURE_TYPE[number];
+
+export const RESOURCE_RECOVERY_TYPE = [
+    "flat",
+    "percentage",
+] as const;
+export type ResourceRecoveryType = typeof RESOURCE_RECOVERY_TYPE[number];

@@ -33,6 +33,7 @@ import {
     SPELL_PREPARATION_TYPE,
     SPELLCASTING_TYPE,
     CLASS_FEATURE_TYPE,
+    RESOURCE_RECOVERY_TYPE,
 } from '@/constants/class';
 import {
     DICE_SELECTION
@@ -109,6 +110,7 @@ export class ReferenceService implements IReferenceService {
             spellcastingType: SPELLCASTING_TYPE,
             diceSelection: DICE_SELECTION,
             classFeatureType: CLASS_FEATURE_TYPE,
+            resourceRecoveryType: RESOURCE_RECOVERY_TYPE,
         };
     }
 }

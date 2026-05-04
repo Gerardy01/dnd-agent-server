@@ -33,7 +33,7 @@ const FeaturesSchema = z.object({
 });
 
 const CreateClassResourceSchema = z.object({
-    image: z.string().optional(),
+    image: z.string().nullable().optional(),
     name: z.string().min(1).max(100),
     description: z.string().min(1),
     color: z.string().max(50),
@@ -42,7 +42,7 @@ const CreateClassResourceSchema = z.object({
 });
 
 export const CreateWorkshopClassSchema = z.object({
-    image: z.string().optional(),
+    image: z.string().nullable().optional(),
     name: z.string().min(1).max(100),
     description: z.string().min(1),
     hitDie: z.string().max(10),
@@ -56,7 +56,7 @@ export const CreateWorkshopClassSchema = z.object({
 export const UpdateWorkshopClassSchema = z.object({
     workshopClassId: z.number().int().positive(),
     isImageUpdated: z.boolean(),
-    image: z.string().optional(),
+    image: z.string().nullable().optional(),
     name: z.string().min(1).max(100),
     description: z.string().min(1),
     hitDie: z.string().max(10),
