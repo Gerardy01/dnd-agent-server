@@ -28,14 +28,24 @@ import {
     MOVEMENT_SELECTION,
     SENSES_SELECTION
 } from '@/constants/monster';
+import {
+    SPELLCASTING_ABILITY_SELECTION,
+    SPELL_PREPARATION_TYPE,
+    SPELLCASTING_TYPE,
+    CLASS_FEATURE_TYPE,
+} from '@/constants/class';
+import {
+    DICE_SELECTION
+} from '@/constants/dice';
 
 // interfaces
-import { 
-    ItemOptionsReturn, 
-    EffectOptionsReturn, 
-    FeatOptionsReturn, 
+import {
+    ItemOptionsReturn,
+    EffectOptionsReturn,
+    FeatOptionsReturn,
     SpellOptionsReturn,
-    MonsterOptionsReturn
+    MonsterOptionsReturn,
+    ClassOptionsReturn
 } from '@/interfaces/IReference';
 export interface IReferenceService {
     getItemOptions(): Promise<ItemOptionsReturn>;
@@ -43,6 +53,7 @@ export interface IReferenceService {
     getFeatOptions(): Promise<FeatOptionsReturn>;
     getSpellOptions(): Promise<SpellOptionsReturn>;
     getMonsterOptions(): Promise<MonsterOptionsReturn>;
+    getClassOptions(): Promise<ClassOptionsReturn>;
 }
 
 export class ReferenceService implements IReferenceService {
@@ -88,6 +99,16 @@ export class ReferenceService implements IReferenceService {
             alignment: ALIGNMENT,
             movementSelection: MOVEMENT_SELECTION,
             sensesSelection: SENSES_SELECTION,
+        };
+    }
+
+    async getClassOptions(): Promise<ClassOptionsReturn> {
+        return {
+            spellcastingAbility: SPELLCASTING_ABILITY_SELECTION,
+            spellPreparationType: SPELL_PREPARATION_TYPE,
+            spellcastingType: SPELLCASTING_TYPE,
+            diceSelection: DICE_SELECTION,
+            classFeatureType: CLASS_FEATURE_TYPE,
         };
     }
 }

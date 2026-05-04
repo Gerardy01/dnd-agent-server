@@ -32,3 +32,11 @@ export type MonsterOptionsReturn = {
     movementSelection: readonly string[];
     sensesSelection: readonly string[];
 }
+
+export type ClassOptionsReturn = {
+    spellcastingAbility: readonly string[];
+    spellPreparationType: readonly string[];
+    spellcastingType: readonly string[];
+    diceSelection: readonly string[];
+    classFeatureType: readonly string[];
+}

@@ -120,6 +120,25 @@ class ReferenceController {
         }
     }
 
+    static async getClassOptions(req: Request, res: Response) {
+        try {
+            const data = await referenceOrchestration.getClassOptions();
+
+            return res.status(200).json({
+                "status": "success",
+                "message": "Class options fetched successfully",
+                "userMessage": "",
+                "data": data
+            });
+        } catch (e) {
+            return res.status(500).json({
+                "status": "failed",
+                "message": "Internal server error",
+                "userMessage": "500",
+                "errors": e
+            });
+        }
+    }
 }
 
 export default ReferenceController;

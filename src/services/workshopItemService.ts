@@ -10,7 +10,7 @@ import { WrongFormat, DataNotFound } from "@/utils/exceptions";
 import { WEAPON_CATEGORIES, ARMOR_CATEGORIES, GEAR_CATEGORIES } from "@/constants/item";
 
 // utils
-import { EquipSlotEnum, ItemTypeEnum } from "@/utils/enums";
+import { ArmorCategoryEnum, EquipSlotEnum, GearCategoryEnum, ItemTypeEnum, WeaponCategoryEnum } from "@/utils/enums";
 
 // interfaces
 import { CreateItemDTO, UpdateItemDTO, WorkshopItemDataReturn } from "@/interfaces/IItem";
@@ -113,7 +113,7 @@ export class WorkshopItemService implements IWorkshopItemService {
                 throw new WrongFormat("damageRoll must have at least 1 item when type is Weapon");
             }
 
-            if (!WEAPON_CATEGORIES.includes(data.category as any)) {
+            if (!WEAPON_CATEGORIES.includes(data.category as WeaponCategoryEnum)) {
                 throw new WrongFormat("category must be a valid weapon category");
             }
         }
@@ -127,7 +127,7 @@ export class WorkshopItemService implements IWorkshopItemService {
                 throw new WrongFormat("baseAc cannot be 0 when type is Armor");
             }
 
-            if (!ARMOR_CATEGORIES.includes(data.category as any)) {
+            if (!ARMOR_CATEGORIES.includes(data.category as ArmorCategoryEnum)) {
                 throw new WrongFormat("category must be a valid armor category");
             }
         }
@@ -141,7 +141,7 @@ export class WorkshopItemService implements IWorkshopItemService {
                 throw new WrongFormat("armorProperties must be null when type is Gear");
             }
 
-            if (!GEAR_CATEGORIES.includes(data.category as any)) {
+            if (!GEAR_CATEGORIES.includes(data.category as GearCategoryEnum)) {
                 throw new WrongFormat("category must be a valid gear category");
             }
         }
@@ -227,7 +227,7 @@ export class WorkshopItemService implements IWorkshopItemService {
             if (data.weaponProperties.damageRoll.length < 1) {
                 throw new WrongFormat("damageRoll must have at least 1 item when type is Weapon");
             }
-            if (!WEAPON_CATEGORIES.includes(data.category as any)) {
+            if (!WEAPON_CATEGORIES.includes(data.category as WeaponCategoryEnum)) {
                 throw new WrongFormat("category must be a valid weapon category");
             }
         }
@@ -239,7 +239,7 @@ export class WorkshopItemService implements IWorkshopItemService {
             if (data.armorProperties.baseAc === 0) {
                 throw new WrongFormat("baseAc cannot be 0 when type is Armor");
             }
-            if (!ARMOR_CATEGORIES.includes(data.category as any)) {
+            if (!ARMOR_CATEGORIES.includes(data.category as ArmorCategoryEnum)) {
                 throw new WrongFormat("category must be a valid armor category");
             }
         }
@@ -251,7 +251,7 @@ export class WorkshopItemService implements IWorkshopItemService {
             if (data.armorProperties !== null && data.armorProperties !== undefined) {
                 throw new WrongFormat("armorProperties must be null when type is Gear");
             }
-            if (!GEAR_CATEGORIES.includes(data.category as any)) {
+            if (!GEAR_CATEGORIES.includes(data.category as GearCategoryEnum)) {
                 throw new WrongFormat("category must be a valid gear category");
             }
         }

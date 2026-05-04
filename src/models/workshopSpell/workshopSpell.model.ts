@@ -1,6 +1,9 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "@/config/database";
 
+// types and interfaces
+import { AttackProperties, SpellSaveProperties } from "@/interfaces/ISpell";
+
 // models
 import Account from "@/models/account/account.model";
 
@@ -13,8 +16,8 @@ class WorkshopSpell extends Model {
     declare public level: number;
     declare public range: number;
     declare public school: string;
-    declare public attack_properties: Record<string, any> | null;
-    declare public spell_save_properties: Record<string, any> | null;
+    declare public attack_properties: AttackProperties | null;
+    declare public spell_save_properties: SpellSaveProperties | null;
     declare public readonly createdAt: Date;
     declare public readonly updatedAt: Date;
 }

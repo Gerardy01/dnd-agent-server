@@ -29,10 +29,7 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
         const resources = await this.classService.getClassResources(workshopClassId);
         const spellIds = await this.classService.getClassSpellIds(workshopClassId);
 
-        let spells: any[] = [];
-        if (spellIds.length > 0) {
-            spells = await this.spellService.getWorkshopSpellsByIds(spellIds, accountId);
-        }
+        const spells = await this.spellService.getSpellsByIds(spellIds, accountId);
 
         return {
             ...classData,
@@ -51,7 +48,7 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
             // 2. Process spells if any exist and class has spellcasting_properties
             if (data.spellIds && data.spellIds.length > 0 && data.spellcastingProperties) {
                 // Validate spells (throws error if not found)
-                await this.spellService.getWorkshopSpellsByIds(data.spellIds, accountId);
+                await this.spellService.getSpellsByIds(data.spellIds, accountId);
 
                 // Create class-spell relationship
                 await this.classService.createClassSpell(data.spellIds, newClass.workshopClassId, transaction);
@@ -121,13 +118,13 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
             // Spells
             await this.classService.deleteClassSpells(updatedClass.workshopClassId, transaction);
             if (data.spellIds && data.spellIds.length > 0 && data.spellcastingProperties) {
-                await this.spellService.getWorkshopSpellsByIds(data.spellIds, accountId);
+                await this.spellService.getSpellsByIds(data.spellIds, accountId);
                 await this.classService.createClassSpell(data.spellIds, updatedClass.workshopClassId, transaction);
             }
 
             // Resources
             await this.classService.deleteClassResources(updatedClass.workshopClassId, transaction);
-            
+
             let resourceImagesToUpdate: { id: number, image: string }[] = [];
             const currentResourceImages: string[] = [];
 
@@ -186,7 +183,7 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
             const oldResourceImagesToDelete = targetResources
                 .map(r => r.image)
                 .filter(i => i && !currentResourceImages.includes(i));
-            
+
             if (oldResourceImagesToDelete.length > 0) {
                 await this.fileService.deleteFilesBulk(oldResourceImagesToDelete as string[]);
             }

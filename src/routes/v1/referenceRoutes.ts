@@ -38,4 +38,10 @@ referenceRoutes.get(
     ReferenceController.getMonsterOptions,
 );
 
+referenceRoutes.get(
+    '/class-options',
+    authenticate,
+    ReferenceController.getClassOptions,
+);
+
 export default referenceRoutes;

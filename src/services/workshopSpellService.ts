@@ -16,7 +16,7 @@ export interface IWorkshopSpellService {
     editSpell(data: UpdateSpellDTO, accountId: string, transaction?: Transaction): Promise<WorkshopSpellDataReturn>;
     deleteSpell(workshopSpellId: number, accountId: string): Promise<void>;
     updateSpellImage(workshopSpellId: number, accountId: string, image: string): Promise<void>;
-    getWorkshopSpellsByIds(spellIds: number[], accountId: string): Promise<WorkshopSpellDataReturn[]>;
+    getSpellsByIds(spellIds: number[], accountId: string): Promise<WorkshopSpellDataReturn[]>;
 }
 
 export class WorkshopSpellService implements IWorkshopSpellService {
@@ -173,7 +173,9 @@ export class WorkshopSpellService implements IWorkshopSpellService {
         await spell.update({ image });
     }
 
-    async getWorkshopSpellsByIds(spellIds: number[], accountId: string): Promise<WorkshopSpellDataReturn[]> {
+    async getSpellsByIds(spellIds: number[], accountId: string): Promise<WorkshopSpellDataReturn[]> {
+        if (spellIds.length === 0) return [];
+
         const uniqueSpellIds = [...new Set(spellIds)];
         const spells = await WorkshopSpell.findAll({
             where: {
