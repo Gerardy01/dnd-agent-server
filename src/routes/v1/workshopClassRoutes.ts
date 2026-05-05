@@ -23,6 +23,12 @@ workshopClassRoutes.get(
     WorkshopClassController.getOneClass,
 );
 
+workshopClassRoutes.get(
+    '/:id/detailed',
+    authenticate,
+    WorkshopClassController.getDetailedClass,
+);
+
 workshopClassRoutes.post(
     '/',
     authenticate,
@@ -35,6 +41,12 @@ workshopClassRoutes.put(
     authenticate,
     validateRequest(UpdateWorkshopClassSchema),
     WorkshopClassController.editClass,
+);
+
+workshopClassRoutes.delete(
+    '/:id',
+    authenticate,
+    WorkshopClassController.deleteClass,
 );
 
 export default workshopClassRoutes;

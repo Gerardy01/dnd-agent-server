@@ -20,6 +20,7 @@ export interface IWorkshopClassService {
     editClass(data: UpdateClassDTO, accountId: string, transaction?: Transaction): Promise<WorkshopClassDataReturn>;
     deleteClassResources(workshopClassId: number, transaction?: Transaction): Promise<void>;
     deleteClassSpells(workshopClassId: number, transaction?: Transaction): Promise<void>;
+    deleteClass(workshopClassId: number, accountId: string, transaction?: Transaction): Promise<void>;
     updateClassImage(workshopClassId: number, accountId: string, image: string): Promise<void>;
     updateClassResourcesImageBulk(resourcesImageKeys: { id: number, image: string }[]): Promise<void>;
 }
@@ -216,6 +217,21 @@ export class WorkshopClassService implements IWorkshopClassService {
             where: { workshop_class_id: workshopClassId },
             transaction: transaction ?? null
         });
+    }
+
+    async deleteClass(workshopClassId: number, accountId: string, transaction?: Transaction): Promise<void> {
+        const workshopClass = await WorkshopClass.findOne({
+            where: {
+                workshop_class_id: workshopClassId,
+                account_id: accountId,
+            }
+        });
+
+        if (!workshopClass) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        await workshopClass.destroy({ transaction: transaction ?? null });
     }
 
     async updateClassImage(workshopClassId: number, accountId: string, image: string): Promise<void> {

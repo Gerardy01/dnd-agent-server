@@ -32,6 +32,11 @@ export type MonsterOptionsReturn = {
     movementSelection: readonly string[];
     sensesSelection: readonly string[];
 }
+export type PresetMaxKnown = {
+    name: string;
+    maxCantripKnown: number[];
+    maxSpellKnown: number[];
+}
 
 export type ClassOptionsReturn = {
     spellcastingAbility: readonly string[];
@@ -40,4 +45,5 @@ export type ClassOptionsReturn = {
     diceSelection: readonly string[];
     classFeatureType: readonly string[];
     resourceRecoveryType: readonly string[];
+    presetMaxKnown: readonly PresetMaxKnown[];
 }

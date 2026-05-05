@@ -60,6 +60,36 @@ class WorkshopClassController {
         }
     }
 
+    static async getDetailedClass(req: Request, res: Response) {
+        try {
+            const accountId = req.user?.accountId || "";
+            const data = await classOrchestration.getDetailedClass(Number(req.params.id), accountId);
+
+            return res.status(200).json({
+                "status": "success",
+                "message": "Class fetched successfully",
+                "userMessage": "",
+                "data": data
+            });
+
+        } catch (e) {
+            if (e instanceof DataNotFound) {
+                return res.status(404).json({
+                    "status": "failed",
+                    "message": "Class not found",
+                    "userMessage": e.message,
+                });
+            }
+
+            return res.status(500).json({
+                "status": "failed",
+                "message": "Internal server error",
+                "userMessage": "500",
+                "errors": e
+            });
+        }
+    }
+
     static async createClass(req: Request, res: Response) {
         try {
             const accountId = req.user?.accountId || "";
@@ -125,6 +155,35 @@ class WorkshopClassController {
                     "status": "failed",
                     "message": e.message,
                     "userMessage": "",
+                });
+            }
+
+            return res.status(500).json({
+                "status": "failed",
+                "message": "Internal server error",
+                "userMessage": "500",
+                "errors": e
+            });
+        }
+    }
+
+    static async deleteClass(req: Request, res: Response) {
+        try {
+            const accountId = req.user?.accountId || "";
+            await classOrchestration.deleteClass(Number(req.params.id), accountId);
+
+            return res.status(200).json({
+                "status": "success",
+                "message": "Class deleted successfully",
+                "userMessage": "",
+            });
+
+        } catch (e) {
+            if (e instanceof DataNotFound) {
+                return res.status(404).json({
+                    "status": "failed",
+                    "message": "Class not found",
+                    "userMessage": e.message,
                 });
             }
 

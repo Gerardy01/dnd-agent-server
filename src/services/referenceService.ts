@@ -34,6 +34,7 @@ import {
     SPELLCASTING_TYPE,
     CLASS_FEATURE_TYPE,
     RESOURCE_RECOVERY_TYPE,
+    PRESET_MAX_KNOWN,
 } from '@/constants/class';
 import {
     DICE_SELECTION
@@ -111,6 +112,7 @@ export class ReferenceService implements IReferenceService {
             diceSelection: DICE_SELECTION,
             classFeatureType: CLASS_FEATURE_TYPE,
             resourceRecoveryType: RESOURCE_RECOVERY_TYPE,
+            presetMaxKnown: PRESET_MAX_KNOWN,
         };
     }
 }

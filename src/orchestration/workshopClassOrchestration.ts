@@ -8,9 +8,11 @@ import { IWorkshopSpellService } from "@/services/workshopSpellService";
 
 export interface IWorkshopClassOrchestration {
     getClasses(accountId: string): Promise<WorkshopClassDataReturn[]>;
-    getOneClass(workshopClassId: number, accountId: string): Promise<WorkshopClassDetailDataReturn>;
+    getOneClass(workshopClassId: number, accountId: string): Promise<WorkshopClassDataReturn>;
+    getDetailedClass(workshopClassId: number, accountId: string): Promise<WorkshopClassDetailDataReturn>;
     createClass(data: CreateClassPayload, accountId: string): Promise<WorkshopClassDataReturn>;
-    editClass(data: UpdateClassPayload, accountId: string): Promise<WorkshopClassDetailDataReturn>;
+    editClass(data: UpdateClassPayload, accountId: string): Promise<WorkshopClassDataReturn>;
+    deleteClass(workshopClassId: number, accountId: string): Promise<void>;
 }
 
 export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
@@ -24,7 +26,11 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
         return await this.classService.getClasses(accountId);
     }
 
-    async getOneClass(workshopClassId: number, accountId: string): Promise<WorkshopClassDetailDataReturn> {
+    async getOneClass(workshopClassId: number, accountId: string): Promise<WorkshopClassDataReturn> {
+        return await this.classService.getOneClass(workshopClassId, accountId);
+    }
+
+    async getDetailedClass(workshopClassId: number, accountId: string): Promise<WorkshopClassDetailDataReturn> {
         const classData = await this.classService.getOneClass(workshopClassId, accountId);
         const resources = await this.classService.getClassResources(workshopClassId);
         const spellIds = await this.classService.getClassSpellIds(workshopClassId);
@@ -106,7 +112,7 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
         }
     }
 
-    async editClass(data: UpdateClassPayload, accountId: string): Promise<WorkshopClassDetailDataReturn> {
+    async editClass(data: UpdateClassPayload, accountId: string): Promise<WorkshopClassDataReturn> {
         const transaction = await sequelize.transaction();
 
         try {
@@ -201,5 +207,21 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
             await transaction.rollback();
             throw error;
         }
+    }
+
+    async deleteClass(workshopClassId: number, accountId: string): Promise<void> {
+        const targetClass = await this.classService.getOneClass(workshopClassId, accountId, true);
+        const targetResources = await this.classService.getClassResources(workshopClassId, true);
+
+        // Delete class image
+        await this.fileService.deleteFile(targetClass.image ?? "");
+
+        // Delete resource images
+        const resourceImagesToDelete = targetResources.map(r => r.image).filter(i => i);
+        if (resourceImagesToDelete.length > 0) {
+            await this.fileService.deleteFilesBulk(resourceImagesToDelete as string[]);
+        }
+
+        await this.classService.deleteClass(workshopClassId, accountId);
     }
 }
