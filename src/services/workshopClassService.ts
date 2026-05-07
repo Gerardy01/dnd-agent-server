@@ -7,7 +7,7 @@ import { WorkshopClass, WorkshopClassResources, WorkshopClassSpell } from "@/mod
 import { DataNotFound } from "@/utils/exceptions";
 
 // interfaces
-import { CreateClassDTO, UpdateClassDTO, CreateClassResourceDTO, WorkshopClassDataReturn, WorkshopClassResourceDataReturn } from "@/interfaces/IClass";
+import { CreateClassDTO, UpdateClassDTO, ClassResourceDTO, WorkshopClassDataReturn, WorkshopClassResourceDataReturn } from "@/interfaces/IClass";
 
 export interface IWorkshopClassService {
     getClasses(accountId: string): Promise<WorkshopClassDataReturn[]>;
@@ -15,7 +15,7 @@ export interface IWorkshopClassService {
     getClassResources(workshopClassId: number, imageKeyOnly?: boolean): Promise<WorkshopClassResourceDataReturn[]>;
     getClassSpellIds(workshopClassId: number): Promise<number[]>;
     createClass(data: CreateClassDTO, accountId: string, transaction?: Transaction): Promise<WorkshopClassDataReturn>;
-    createClassResources(data: CreateClassResourceDTO[], accountId: string, workshopClassId: number, transaction?: Transaction): Promise<WorkshopClassResourceDataReturn[]>;
+    createClassResources(data: ClassResourceDTO[], accountId: string, workshopClassId: number, transaction?: Transaction): Promise<WorkshopClassResourceDataReturn[]>;
     createClassSpell(spellIds: number[], workshopClassId: number, transaction?: Transaction): Promise<void>;
     editClass(data: UpdateClassDTO, accountId: string, transaction?: Transaction): Promise<WorkshopClassDataReturn>;
     deleteClassResources(workshopClassId: number, transaction?: Transaction): Promise<void>;
@@ -133,7 +133,7 @@ export class WorkshopClassService implements IWorkshopClassService {
         };
     }
 
-    async createClassResources(data: CreateClassResourceDTO[], accountId: string, workshopClassId: number, transaction?: Transaction): Promise<WorkshopClassResourceDataReturn[]> {
+    async createClassResources(data: ClassResourceDTO[], accountId: string, workshopClassId: number, transaction?: Transaction): Promise<WorkshopClassResourceDataReturn[]> {
         const resourcesToCreate = data.map(resource => ({
             workshop_class_id: workshopClassId,
             image: "",

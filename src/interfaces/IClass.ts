@@ -32,7 +32,7 @@ export interface ResourceRecovery {
     longRest: ResourceRecoveryProps;
 }
 
-export interface CreateClassResourceDTO {
+export interface ClassResourceDTO {
     image?: string;
     name: string;
     description: string;
@@ -52,7 +52,7 @@ export interface CreateClassDTO {
 }
 
 export interface CreateClassPayload extends CreateClassDTO {
-    resources: CreateClassResourceDTO[];
+    resources: ClassResourceDTO[];
     spellIds: number[];
 }
 
@@ -87,7 +87,7 @@ export interface UpdateClassDTO extends CreateClassDTO {
 }
 
 export interface UpdateClassPayload extends UpdateClassDTO {
-    resources: CreateClassResourceDTO[];
+    resources: ClassResourceDTO[];
     spellIds: number[];
 }
 
