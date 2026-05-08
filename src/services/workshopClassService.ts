@@ -7,7 +7,7 @@ import { WorkshopClass, WorkshopClassResources, WorkshopClassSpell } from "@/mod
 import { DataNotFound } from "@/utils/exceptions";
 
 // interfaces
-import { CreateClassDTO, UpdateClassDTO, ClassResourceDTO, WorkshopClassDataReturn, WorkshopClassResourceDataReturn } from "@/interfaces/IClass";
+import { CreateClassDTO, UpdateClassDTO, ClassResourceDTO, WorkshopClassDataReturn, WorkshopClassResourceDataReturn, AddFeaturePayload, EditFeaturePayload, DeleteFeaturePayload, AddResourcePayload, EditResourcePayload, DeleteResourcePayload, ClassResourceReturn } from "@/interfaces/IClass";
 
 export interface IWorkshopClassService {
     getClasses(accountId: string): Promise<WorkshopClassDataReturn[]>;
@@ -23,6 +23,13 @@ export interface IWorkshopClassService {
     deleteClass(workshopClassId: number, accountId: string, transaction?: Transaction): Promise<void>;
     updateClassImage(workshopClassId: number, accountId: string, image: string): Promise<void>;
     updateClassResourcesImageBulk(resourcesImageKeys: { id: number, image: string }[]): Promise<void>;
+    addFeature(data: AddFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn>;
+    editFeature(data: EditFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn>;
+    deleteFeature(data: DeleteFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn>;
+    addResource(data: AddResourcePayload, accountId: string): Promise<ClassResourceReturn>;
+    editResource(data: EditResourcePayload, accountId: string): Promise<ClassResourceReturn>;
+    deleteResource(data: DeleteResourcePayload, accountId: string): Promise<ClassResourceReturn>;
+    getOneResource(resourceId: number, workshopClassId: number, accountId: string): Promise<WorkshopClassResourceDataReturn>;
 }
 
 export class WorkshopClassService implements IWorkshopClassService {
@@ -262,5 +269,267 @@ export class WorkshopClassService implements IWorkshopClassService {
             ));
 
         await Promise.all(updatePromises);
+    }
+
+    async addFeature(data: AddFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn> {
+        const workshopClass = await WorkshopClass.findOne({
+            where: {
+                workshop_class_id: data.workshopClassId,
+                account_id: accountId,
+            }
+        });
+
+        if (!workshopClass) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        const features = [...workshopClass.features, data.feature];
+
+        const updated = await workshopClass.update({ features });
+
+        return {
+            workshopClassId: updated.workshop_class_id,
+            accountId: updated.account_id,
+            image: updated.image,
+            name: updated.name,
+            description: updated.description,
+            hitDie: updated.hit_die,
+            subclassLevel: updated.subclass_level,
+            spellcastingProperties: updated.spellcasting_properties,
+            features: updated.features,
+            createdAt: updated.createdAt,
+        };
+    }
+
+    async editFeature(data: EditFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn> {
+        const workshopClass = await WorkshopClass.findOne({
+            where: {
+                workshop_class_id: data.workshopClassId,
+                account_id: accountId,
+            }
+        });
+
+        if (!workshopClass) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        const features = [...workshopClass.features];
+        const index = features.findIndex(f =>
+            f.name === data.currentFeature.name &&
+            f.level === data.currentFeature.level &&
+            f.description === data.currentFeature.description &&
+            f.type === data.currentFeature.type
+        );
+
+        if (index !== -1) {
+            features[index] = data.newFeature;
+        }
+
+        const updated = await workshopClass.update({ features });
+
+        return {
+            workshopClassId: updated.workshop_class_id,
+            accountId: updated.account_id,
+            image: updated.image,
+            name: updated.name,
+            description: updated.description,
+            hitDie: updated.hit_die,
+            subclassLevel: updated.subclass_level,
+            spellcastingProperties: updated.spellcasting_properties,
+            features: updated.features,
+            createdAt: updated.createdAt,
+        };
+    }
+
+    async deleteFeature(data: DeleteFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn> {
+        const workshopClass = await WorkshopClass.findOne({
+            where: {
+                workshop_class_id: data.workshopClassId,
+                account_id: accountId,
+            }
+        });
+
+        if (!workshopClass) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        const features = [...workshopClass.features];
+        const index = features.findIndex(f =>
+            f.name === data.feature.name &&
+            f.level === data.feature.level &&
+            f.description === data.feature.description &&
+            f.type === data.feature.type
+        );
+
+        if (index !== -1) {
+            features.splice(index, 1);
+        }
+
+        const updated = await workshopClass.update({ features });
+
+        return {
+            workshopClassId: updated.workshop_class_id,
+            accountId: updated.account_id,
+            image: updated.image,
+            name: updated.name,
+            description: updated.description,
+            hitDie: updated.hit_die,
+            subclassLevel: updated.subclass_level,
+            spellcastingProperties: updated.spellcasting_properties,
+            features: updated.features,
+            createdAt: updated.createdAt,
+        };
+    }
+    async addResource(data: AddResourcePayload, accountId: string): Promise<ClassResourceReturn> {
+        const workshopClass = await WorkshopClass.findOne({
+            where: {
+                workshop_class_id: data.workshopClassId,
+                account_id: accountId,
+            }
+        });
+
+        if (!workshopClass) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        const newResource = await WorkshopClassResources.create({
+            workshop_class_id: data.workshopClassId,
+            image: data.resource.image || "",
+            name: data.resource.name,
+            description: data.resource.description,
+            color: data.resource.color,
+            max_per_level: data.resource.maxPerLevel,
+            resource_recovery: data.resource.resourceRecovery,
+        });
+
+        return {
+            id: newResource.id,
+            image: newResource.image,
+            name: newResource.name,
+            description: newResource.description,
+            color: newResource.color,
+            maxPerLevel: newResource.max_per_level,
+            resourceRecovery: newResource.resource_recovery,
+        };
+    }
+
+    async editResource(data: EditResourcePayload, accountId: string): Promise<ClassResourceReturn> {
+
+        const workshopClass = await WorkshopClass.findOne({
+            where: {
+                workshop_class_id: data.workshopClassId,
+                account_id: accountId,
+            }
+        });
+
+        if (!workshopClass) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        const resource = await WorkshopClassResources.findOne({
+            where: {
+                id: data.classResourceId,
+                workshop_class_id: data.workshopClassId,
+            }
+        });
+
+        if (!resource) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        await resource.update({
+            image: data.resource.image || "",
+            name: data.resource.name,
+            description: data.resource.description,
+            color: data.resource.color,
+            max_per_level: data.resource.maxPerLevel,
+            resource_recovery: data.resource.resourceRecovery,
+        });
+
+        return {
+            id: resource.id,
+            image: resource.image,
+            name: resource.name,
+            description: resource.description,
+            color: resource.color,
+            maxPerLevel: resource.max_per_level,
+            resourceRecovery: resource.resource_recovery,
+        };
+    }
+
+
+    async deleteResource(data: DeleteResourcePayload, accountId: string): Promise<ClassResourceReturn> {
+        const workshopClass = await WorkshopClass.findOne({
+            where: {
+                workshop_class_id: data.workshopClassId,
+                account_id: accountId,
+            }
+        });
+
+        if (!workshopClass) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        const resource = await WorkshopClassResources.findOne({
+            where: {
+                id: data.classResourceId,
+                workshop_class_id: data.workshopClassId,
+            }
+        });
+
+        if (!resource) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        const deletedResource: ClassResourceReturn = {
+            id: resource.id,
+            image: resource.image,
+            name: resource.name,
+            description: resource.description,
+            color: resource.color,
+            maxPerLevel: resource.max_per_level,
+            resourceRecovery: resource.resource_recovery,
+        };
+
+        await resource.destroy();
+
+        return deletedResource;
+    }
+
+    async getOneResource(resourceId: number, workshopClassId: number, accountId: string): Promise<WorkshopClassResourceDataReturn> {
+
+        const workshopClass = await WorkshopClass.findOne({
+            where: {
+                workshop_class_id: workshopClassId,
+                account_id: accountId,
+            }
+        });
+
+        if (!workshopClass) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        const resource = await WorkshopClassResources.findOne({
+            where: {
+                id: resourceId,
+                workshop_class_id: workshopClassId,
+            },
+        });
+
+        if (!resource) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        return {
+            id: resource.id,
+            workshopClassId: resource.workshop_class_id,
+            image: resource.image,
+            name: resource.name,
+            description: resource.description,
+            color: resource.color,
+            maxPerLevel: resource.max_per_level,
+            resourceRecovery: resource.resource_recovery,
+            createdAt: resource.createdAt,
+        };
     }
 }

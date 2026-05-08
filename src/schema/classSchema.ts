@@ -66,3 +66,35 @@ export const UpdateWorkshopClassSchema = z.object({
     resources: z.array(CreateClassResourceSchema),
     spellIds: z.array(z.number().int()),
 });
+
+export const AddFeatureSchema = z.object({
+    workshopClassId: z.number().int().positive(),
+    feature: FeaturesSchema,
+});
+
+export const EditFeatureSchema = z.object({
+    workshopClassId: z.number().int().positive(),
+    currentFeature: FeaturesSchema,
+    newFeature: FeaturesSchema,
+});
+
+export const DeleteFeatureSchema = z.object({
+    workshopClassId: z.number().int().positive(),
+    feature: FeaturesSchema,
+});
+
+export const AddResourceSchema = z.object({
+    workshopClassId: z.number().int().positive(),
+    resource: CreateClassResourceSchema,
+});
+
+export const EditResourceSchema = z.object({
+    workshopClassId: z.number().int().positive(),
+    classResourceId: z.number().int().positive(),
+    resource: CreateClassResourceSchema,
+});
+
+export const DeleteResourceSchema = z.object({
+    workshopClassId: z.number().int().positive(),
+    classResourceId: z.number().int().positive(),
+});

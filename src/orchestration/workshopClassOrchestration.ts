@@ -1,7 +1,7 @@
 import sequelize from '@/config/database';
 
 // interfaces
-import { CreateClassPayload, UpdateClassPayload, WorkshopClassDataReturn, WorkshopClassDetailDataReturn } from "@/interfaces/IClass";
+import { CreateClassPayload, UpdateClassPayload, WorkshopClassDataReturn, WorkshopClassDetailDataReturn, AddFeaturePayload, EditFeaturePayload, DeleteFeaturePayload, AddResourcePayload, EditResourcePayload, DeleteResourcePayload, ClassResourceReturn } from "@/interfaces/IClass";
 import { IFileService } from "@/services/fileService";
 import { IWorkshopClassService } from "@/services/workshopClassService";
 import { IWorkshopSpellService } from "@/services/workshopSpellService";
@@ -13,6 +13,12 @@ export interface IWorkshopClassOrchestration {
     createClass(data: CreateClassPayload, accountId: string): Promise<WorkshopClassDataReturn>;
     editClass(data: UpdateClassPayload, accountId: string): Promise<WorkshopClassDataReturn>;
     deleteClass(workshopClassId: number, accountId: string): Promise<void>;
+    addFeature(data: AddFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn>;
+    editFeature(data: EditFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn>;
+    deleteFeature(data: DeleteFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn>;
+    addResource(data: AddResourcePayload, accountId: string): Promise<ClassResourceReturn>;
+    editResource(data: EditResourcePayload, accountId: string): Promise<ClassResourceReturn>;
+    deleteResource(data: DeleteResourcePayload, accountId: string): Promise<void>;
 }
 
 export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
@@ -223,5 +229,58 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
         }
 
         await this.classService.deleteClass(workshopClassId, accountId);
+    }
+
+    async addFeature(data: AddFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn> {
+        return await this.classService.addFeature(data, accountId);
+    }
+
+    async editFeature(data: EditFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn> {
+        return await this.classService.editFeature(data, accountId);
+    }
+
+    async deleteFeature(data: DeleteFeaturePayload, accountId: string): Promise<WorkshopClassDataReturn> {
+        return await this.classService.deleteFeature(data, accountId);
+    }
+
+    async addResource(data: AddResourcePayload, accountId: string): Promise<ClassResourceReturn> {
+
+        // If image provided, move it from temp to final
+        if (data.resource.image && data.resource.image.startsWith("user/temp/")) {
+            const destKey = `user/uploads/workshop/class_resources/${data.workshopClassId}-${accountId}-${Date.now()}`;
+            const imageKey = await this.fileService.moveTempFileToFinalLocation(data.resource.image, destKey);
+            data.resource.image = imageKey;
+        }
+
+        return await this.classService.addResource(data, accountId);
+    }
+
+    async editResource(data: EditResourcePayload, accountId: string): Promise<ClassResourceReturn> {
+
+        const existingResource = await this.classService.getOneResource(data.classResourceId, data.workshopClassId, accountId);
+
+        if (data.resource.image && data.resource.image.startsWith("user/temp/")) {
+            const destKey = `user/uploads/workshop/class_resources/${data.classResourceId}-${accountId}-${Date.now()}`;
+            const imageKey = await this.fileService.moveTempFileToFinalLocation(data.resource.image, destKey);
+
+            data.resource.image = imageKey;
+        }
+
+        if (existingResource.image) {
+            await this.fileService.deleteFile(existingResource.image);
+        }
+
+        return await this.classService.editResource(data, accountId);
+    }
+
+    async deleteResource(data: DeleteResourcePayload, accountId: string): Promise<void> {
+        const existingResource = await this.classService.getOneResource(data.classResourceId, data.workshopClassId, accountId);
+
+        // Delete image if it exists
+        if (existingResource.image) {
+            await this.fileService.deleteFile(existingResource.image);
+        }
+
+        await this.classService.deleteResource(data, accountId);
     }
 }

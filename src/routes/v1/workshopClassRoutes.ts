@@ -4,7 +4,7 @@ import { Router } from 'express';
 import { authenticate, validateRequest } from '@/utils/middleware';
 
 // schema
-import { CreateWorkshopClassSchema, UpdateWorkshopClassSchema } from '@/schema/classSchema';
+import { CreateWorkshopClassSchema, UpdateWorkshopClassSchema, AddFeatureSchema, EditFeatureSchema, DeleteFeatureSchema, AddResourceSchema, EditResourceSchema, DeleteResourceSchema } from '@/schema/classSchema';
 
 // controller
 import WorkshopClassController from '@/controller/workshopClassController';
@@ -47,6 +47,48 @@ workshopClassRoutes.delete(
     '/:id',
     authenticate,
     WorkshopClassController.deleteClass,
+);
+
+workshopClassRoutes.post(
+    '/action/feature',
+    authenticate,
+    validateRequest(AddFeatureSchema),
+    WorkshopClassController.addFeature,
+);
+
+workshopClassRoutes.put(
+    '/action/feature',
+    authenticate,
+    validateRequest(EditFeatureSchema),
+    WorkshopClassController.editFeature,
+);
+
+workshopClassRoutes.delete(
+    '/action/feature',
+    authenticate,
+    validateRequest(DeleteFeatureSchema),
+    WorkshopClassController.deleteFeature,
+);
+
+workshopClassRoutes.post(
+    '/action/resource',
+    authenticate,
+    validateRequest(AddResourceSchema),
+    WorkshopClassController.addResource,
+);
+
+workshopClassRoutes.put(
+    '/action/resource',
+    authenticate,
+    validateRequest(EditResourceSchema),
+    WorkshopClassController.editResource,
+);
+
+workshopClassRoutes.delete(
+    '/action/resource',
+    authenticate,
+    validateRequest(DeleteResourceSchema),
+    WorkshopClassController.deleteResource,
 );
 
 export default workshopClassRoutes;

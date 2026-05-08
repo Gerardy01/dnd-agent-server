@@ -95,3 +95,45 @@ export interface WorkshopClassDetailDataReturn extends WorkshopClassDataReturn {
     resources: WorkshopClassResourceDataReturn[];
     spells: WorkshopSpellDataReturn[];
 }
+
+export interface AddFeaturePayload {
+    workshopClassId: number;
+    feature: Features;
+}
+
+export interface EditFeaturePayload {
+    workshopClassId: number;
+    currentFeature: Features;
+    newFeature: Features;
+}
+
+export interface DeleteFeaturePayload {
+    workshopClassId: number;
+    feature: Features;
+}
+
+export interface AddResourcePayload {
+    workshopClassId: number;
+    resource: ClassResourceDTO;
+}
+
+export interface EditResourcePayload {
+    workshopClassId: number;
+    classResourceId: number;
+    resource: ClassResourceDTO;
+}
+
+export interface DeleteResourcePayload {
+    workshopClassId: number;
+    classResourceId: number;
+}
+
+export type ClassResourceReturn = {
+    id: number;
+    image: string | null;
+    name: string;
+    description: string;
+    color: string;
+    maxPerLevel: MaxKnown[];
+    resourceRecovery: ResourceRecovery;
+}
