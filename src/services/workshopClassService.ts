@@ -1,13 +1,13 @@
 import { Transaction } from "sequelize";
 
 // models
-import { WorkshopClass, WorkshopClassResources, WorkshopClassSpell } from "@/models";
+import { WorkshopClass, WorkshopClassResources, WorkshopClassSpell, WorkshopClassSub, WorkshopClassSubResources, WorkshopClassSubSpell } from "@/models";
 
 // exceptions
 import { DataNotFound } from "@/utils/exceptions";
 
 // interfaces
-import { CreateClassDTO, UpdateClassDTO, ClassResourceDTO, WorkshopClassDataReturn, WorkshopClassResourceDataReturn, AddFeaturePayload, EditFeaturePayload, DeleteFeaturePayload, AddResourcePayload, EditResourcePayload, DeleteResourcePayload, ClassResourceReturn } from "@/interfaces/IClass";
+import { CreateClassDTO, UpdateClassDTO, ClassResourceDTO, WorkshopClassDataReturn, WorkshopClassResourceDataReturn, AddFeaturePayload, EditFeaturePayload, DeleteFeaturePayload, AddResourcePayload, EditResourcePayload, DeleteResourcePayload, ClassResourceReturn, CreateClassSubDTO, UpdateClassSubDTO, WorkshopClassSubDataReturn, WorkshopClassSubResourceDataReturn } from "@/interfaces/IClass";
 
 export interface IWorkshopClassService {
     getClasses(accountId: string): Promise<WorkshopClassDataReturn[]>;
@@ -30,6 +30,19 @@ export interface IWorkshopClassService {
     editResource(data: EditResourcePayload, accountId: string): Promise<ClassResourceReturn>;
     deleteResource(data: DeleteResourcePayload, accountId: string): Promise<ClassResourceReturn>;
     getOneResource(resourceId: number, workshopClassId: number, accountId: string): Promise<WorkshopClassResourceDataReturn>;
+    getSubclasses(workshopClassId: number, accountId: string): Promise<WorkshopClassSubDataReturn[]>;
+    getOneSubclass(subclassId: number, workshopClassId: number, accountId: string, imageKeyOnly?: boolean): Promise<WorkshopClassSubDataReturn>;
+    getSubclassResources(subclassId: number, imageKeyOnly?: boolean): Promise<WorkshopClassSubResourceDataReturn[]>;
+    getSubclassSpellIds(subclassId: number): Promise<number[]>;
+    createSubclass(data: CreateClassSubDTO, accountId: string, transaction?: Transaction): Promise<WorkshopClassSubDataReturn>;
+    createSubclassResources(data: ClassResourceDTO[], accountId: string, subclassId: number, transaction?: Transaction): Promise<WorkshopClassSubResourceDataReturn[]>;
+    createSubclassSpell(spellIds: number[], subclassId: number, transaction?: Transaction): Promise<void>;
+    editSubclass(data: UpdateClassSubDTO, accountId: string, transaction?: Transaction): Promise<WorkshopClassSubDataReturn>;
+    deleteSubclassResources(subclassId: number, transaction?: Transaction): Promise<void>;
+    deleteSubclassSpells(subclassId: number, transaction?: Transaction): Promise<void>;
+    deleteSubclass(subclassId: number, workshopClassId: number, accountId: string, transaction?: Transaction): Promise<void>;
+    updateSubclassImage(subclassId: number, accountId: string, image: string): Promise<void>;
+    updateSubclassResourcesImageBulk(resourcesImageKeys: { id: number, image: string }[]): Promise<void>;
 }
 
 export class WorkshopClassService implements IWorkshopClassService {
@@ -532,4 +545,236 @@ export class WorkshopClassService implements IWorkshopClassService {
             createdAt: resource.createdAt,
         };
     }
+
+    async getSubclasses(workshopClassId: number, accountId: string): Promise<WorkshopClassSubDataReturn[]> {
+        await this.getOneClass(workshopClassId, accountId); // validate class access
+
+        const subclasses = await WorkshopClassSub.findAll({
+            where: { workshop_class_id: workshopClassId },
+            order: [['created_at', 'DESC']]
+        });
+
+        const imageBaseUrl = process.env.FILE_PUBLIC_URL || "";
+
+        return subclasses.map(c => ({
+            id: c.id,
+            workshopClassId: c.workshop_class_id,
+            image: c.image ? `${imageBaseUrl}/${c.image}` : "",
+            name: c.name,
+            description: c.description,
+            spellcastingProperties: c.spellcasting_properties,
+            features: c.features,
+            createdAt: c.createdAt,
+        }));
+    }
+
+    async getOneSubclass(subclassId: number, workshopClassId: number, accountId: string, imageKeyOnly?: boolean): Promise<WorkshopClassSubDataReturn> {
+        await this.getOneClass(workshopClassId, accountId); // validate class access
+
+        const c = await WorkshopClassSub.findOne({
+            where: {
+                id: subclassId,
+                workshop_class_id: workshopClassId
+            }
+        });
+
+        if (!c) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        const imageBaseUrl = process.env.FILE_PUBLIC_URL || "";
+        const image = imageKeyOnly ? c.image : c.image ? `${imageBaseUrl}/${c.image}` : "";
+
+        return {
+            id: c.id,
+            workshopClassId: c.workshop_class_id,
+            image: image,
+            name: c.name,
+            description: c.description,
+            spellcastingProperties: c.spellcasting_properties,
+            features: c.features,
+            createdAt: c.createdAt,
+        };
+    }
+
+    async getSubclassResources(subclassId: number, imageKeyOnly?: boolean): Promise<WorkshopClassSubResourceDataReturn[]> {
+        const resources = await WorkshopClassSubResources.findAll({
+            where: { workshop_class_sub_id: subclassId }
+        });
+
+        const imageBaseUrl = process.env.FILE_PUBLIC_URL || "";
+
+        return resources.map(resource => ({
+            id: resource.id,
+            workshopClassSubId: resource.workshop_class_sub_id,
+            image: imageKeyOnly ? resource.image : resource.image ? `${imageBaseUrl}/${resource.image}` : "",
+            name: resource.name,
+            description: resource.description,
+            color: resource.color,
+            maxPerLevel: resource.max_per_level,
+            resourceRecovery: resource.resource_recovery,
+            createdAt: resource.createdAt,
+        }));
+    }
+
+    async getSubclassSpellIds(subclassId: number): Promise<number[]> {
+        const spells = await WorkshopClassSubSpell.findAll({
+            where: { workshop_class_sub_id: subclassId }
+        });
+
+        return spells.map(s => s.workshop_spell_id);
+    }
+
+    async createSubclass(data: CreateClassSubDTO, accountId: string, transaction?: Transaction): Promise<WorkshopClassSubDataReturn> {
+        await this.getOneClass(data.workshopClassId, accountId); // validate class access
+
+        const newSubclass = await WorkshopClassSub.create({
+            workshop_class_id: data.workshopClassId,
+            image: "",
+            name: data.name,
+            description: data.description,
+            spellcasting_properties: data.spellcastingProperties || null,
+            features: data.features || [],
+        }, { transaction: transaction ?? null });
+
+        return {
+            id: newSubclass.id,
+            workshopClassId: newSubclass.workshop_class_id,
+            image: newSubclass.image,
+            name: newSubclass.name,
+            description: newSubclass.description,
+            spellcastingProperties: newSubclass.spellcasting_properties,
+            features: newSubclass.features,
+            createdAt: newSubclass.createdAt,
+        };
+    }
+
+    async createSubclassResources(data: ClassResourceDTO[], accountId: string, subclassId: number, transaction?: Transaction): Promise<WorkshopClassSubResourceDataReturn[]> {
+        const resourcesToCreate = data.map(resource => ({
+            workshop_class_sub_id: subclassId,
+            image: "",
+            name: resource.name,
+            description: resource.description,
+            color: resource.color,
+            max_per_level: resource.maxPerLevel,
+            resource_recovery: resource.resourceRecovery,
+        }));
+
+        const newResources = await WorkshopClassSubResources.bulkCreate(resourcesToCreate, { transaction: transaction ?? null, returning: true });
+
+        return newResources.map(resource => ({
+            id: resource.id,
+            workshopClassSubId: resource.workshop_class_sub_id,
+            image: resource.image,
+            name: resource.name,
+            description: resource.description,
+            color: resource.color,
+            maxPerLevel: resource.max_per_level,
+            resourceRecovery: resource.resource_recovery,
+            createdAt: resource.createdAt,
+        }));
+    }
+
+    async createSubclassSpell(spellIds: number[], subclassId: number, transaction?: Transaction): Promise<void> {
+        const uniqueSpellIds = [...new Set(spellIds)];
+        const spellsToCreate = uniqueSpellIds.map(spellId => ({
+            workshop_class_sub_id: subclassId,
+            workshop_spell_id: spellId,
+        }));
+
+        await WorkshopClassSubSpell.bulkCreate(spellsToCreate, { transaction: transaction ?? null });
+    }
+
+    async editSubclass(data: UpdateClassSubDTO, accountId: string, transaction?: Transaction): Promise<WorkshopClassSubDataReturn> {
+        await this.getOneClass(data.workshopClassId, accountId); // validate class access
+
+        const subclass = await WorkshopClassSub.findOne({
+            where: {
+                id: data.id,
+                workshop_class_id: data.workshopClassId,
+            }
+        });
+
+        if (!subclass) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        await subclass.update({
+            image: data.isImageUpdated ? data.image : subclass.image,
+            name: data.name,
+            description: data.description,
+            spellcasting_properties: data.spellcastingProperties || null,
+            features: data.features || [],
+        }, { transaction: transaction ?? null });
+
+        return {
+            id: subclass.id,
+            workshopClassId: subclass.workshop_class_id,
+            image: subclass.image,
+            name: subclass.name,
+            description: subclass.description,
+            spellcastingProperties: subclass.spellcasting_properties,
+            features: subclass.features,
+            createdAt: subclass.createdAt,
+        };
+    }
+
+    async deleteSubclassResources(subclassId: number, transaction?: Transaction): Promise<void> {
+        await WorkshopClassSubResources.destroy({
+            where: { workshop_class_sub_id: subclassId },
+            transaction: transaction ?? null
+        });
+    }
+
+    async deleteSubclassSpells(subclassId: number, transaction?: Transaction): Promise<void> {
+        await WorkshopClassSubSpell.destroy({
+            where: { workshop_class_sub_id: subclassId },
+            transaction: transaction ?? null
+        });
+    }
+
+    async deleteSubclass(subclassId: number, workshopClassId: number, accountId: string, transaction?: Transaction): Promise<void> {
+        await this.getOneClass(workshopClassId, accountId); // validate class access
+
+        const subclass = await WorkshopClassSub.findOne({
+            where: {
+                id: subclassId,
+                workshop_class_id: workshopClassId,
+            }
+        });
+
+        if (!subclass) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        await subclass.destroy({ transaction: transaction ?? null });
+    }
+
+    async updateSubclassImage(subclassId: number, accountId: string, image: string): Promise<void> {
+        if (!image) return;
+
+        const subclass = await WorkshopClassSub.findOne({
+            where: { id: subclassId }
+        });
+
+        if (!subclass) {
+            throw new DataNotFound("CLASS001");
+        }
+
+        await subclass.update({ image });
+    }
+
+    async updateSubclassResourcesImageBulk(resourcesImageKeys: { id: number, image: string }[]): Promise<void> {
+        if (resourcesImageKeys.length === 0) return;
+
+        const updatePromises = resourcesImageKeys
+            .filter(item => item.image)
+            .map(item => WorkshopClassSubResources.update(
+                { image: item.image },
+                { where: { id: item.id } }
+            ));
+
+        await Promise.all(updatePromises);
+    }
+
 }

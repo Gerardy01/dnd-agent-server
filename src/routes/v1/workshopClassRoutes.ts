@@ -4,7 +4,7 @@ import { Router } from 'express';
 import { authenticate, validateRequest } from '@/utils/middleware';
 
 // schema
-import { CreateWorkshopClassSchema, UpdateWorkshopClassSchema, AddFeatureSchema, EditFeatureSchema, DeleteFeatureSchema, AddResourceSchema, EditResourceSchema, DeleteResourceSchema } from '@/schema/classSchema';
+import { CreateWorkshopClassSchema, UpdateWorkshopClassSchema, AddFeatureSchema, EditFeatureSchema, DeleteFeatureSchema, AddResourceSchema, EditResourceSchema, DeleteResourceSchema, CreateWorkshopClassSubSchema, UpdateWorkshopClassSubSchema } from '@/schema/classSchema';
 
 // controller
 import WorkshopClassController from '@/controller/workshopClassController';
@@ -15,6 +15,44 @@ workshopClassRoutes.get(
     '/',
     authenticate,
     WorkshopClassController.getClasses,
+);
+
+workshopClassRoutes.get(
+    '/subclass',
+    authenticate,
+    WorkshopClassController.getSubclasses,
+);
+
+workshopClassRoutes.get(
+    '/subclass/:id',
+    authenticate,
+    WorkshopClassController.getOneSubclass,
+);
+
+workshopClassRoutes.get(
+    '/subclass/:id/detailed',
+    authenticate,
+    WorkshopClassController.getDetailedSubclass,
+);
+
+workshopClassRoutes.post(
+    '/subclass',
+    authenticate,
+    validateRequest(CreateWorkshopClassSubSchema),
+    WorkshopClassController.createSubclass,
+);
+
+workshopClassRoutes.put(
+    '/subclass',
+    authenticate,
+    validateRequest(UpdateWorkshopClassSubSchema),
+    WorkshopClassController.editSubclass,
+);
+
+workshopClassRoutes.delete(
+    '/subclass/:id',
+    authenticate,
+    WorkshopClassController.deleteSubclass,
 );
 
 workshopClassRoutes.get(

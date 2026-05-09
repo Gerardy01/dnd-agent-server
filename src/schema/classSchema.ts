@@ -98,3 +98,27 @@ export const DeleteResourceSchema = z.object({
     workshopClassId: z.number().int().positive(),
     classResourceId: z.number().int().positive(),
 });
+
+export const CreateWorkshopClassSubSchema = z.object({
+    workshopClassId: z.number().int().positive(),
+    image: z.string().nullable().optional(),
+    name: z.string().min(1).max(100),
+    description: z.string().min(1),
+    spellcastingProperties: SpellcastingPropertiesSchema.nullable(),
+    features: z.array(FeaturesSchema),
+    resources: z.array(CreateClassResourceSchema),
+    spellIds: z.array(z.number().int()),
+});
+
+export const UpdateWorkshopClassSubSchema = z.object({
+    id: z.number().int().positive(),
+    workshopClassId: z.number().int().positive(),
+    isImageUpdated: z.boolean(),
+    image: z.string().nullable().optional(),
+    name: z.string().min(1).max(100),
+    description: z.string().min(1),
+    spellcastingProperties: SpellcastingPropertiesSchema.nullable(),
+    features: z.array(FeaturesSchema),
+    resources: z.array(CreateClassResourceSchema),
+    spellIds: z.array(z.number().int()),
+});

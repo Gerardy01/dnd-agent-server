@@ -137,3 +137,55 @@ export type ClassResourceReturn = {
     maxPerLevel: MaxKnown[];
     resourceRecovery: ResourceRecovery;
 }
+
+export interface CreateClassSubDTO {
+    workshopClassId: number;
+    image?: string;
+    name: string;
+    description: string;
+    spellcastingProperties: SpellcastingProperties | null;
+    features: Features[];
+}
+
+export interface CreateClassSubPayload extends CreateClassSubDTO {
+    resources: ClassResourceDTO[];
+    spellIds: number[];
+}
+
+export interface WorkshopClassSubResourceDataReturn {
+    id: number;
+    workshopClassSubId: number;
+    image: string;
+    name: string;
+    description: string;
+    color: string;
+    maxPerLevel: MaxKnown[];
+    resourceRecovery: ResourceRecovery;
+    createdAt?: Date;
+}
+
+export interface WorkshopClassSubDataReturn {
+    id: number;
+    workshopClassId: number;
+    image: string;
+    name: string;
+    description: string;
+    spellcastingProperties: SpellcastingProperties | null;
+    features: Features[];
+    createdAt?: Date;
+}
+
+export interface UpdateClassSubDTO extends CreateClassSubDTO {
+    id: number;
+    isImageUpdated: boolean;
+}
+
+export interface UpdateClassSubPayload extends UpdateClassSubDTO {
+    resources: ClassResourceDTO[];
+    spellIds: number[];
+}
+
+export interface WorkshopClassSubDetailDataReturn extends WorkshopClassSubDataReturn {
+    resources: WorkshopClassSubResourceDataReturn[];
+    spells: WorkshopSpellDataReturn[];
+}
