@@ -20,11 +20,11 @@ export interface IWorkshopClassOrchestration {
     editResource(data: EditResourcePayload, accountId: string): Promise<ClassResourceReturn>;
     deleteResource(data: DeleteResourcePayload, accountId: string): Promise<void>;
     getSubclasses(workshopClassId: number, accountId: string): Promise<WorkshopClassSubDataReturn[]>;
-    getOneSubclass(subclassId: number, workshopClassId: number, accountId: string): Promise<WorkshopClassSubDataReturn>;
-    getDetailedSubclass(subclassId: number, workshopClassId: number, accountId: string): Promise<WorkshopClassSubDetailDataReturn>;
+    getOneSubclass(subclassId: number, accountId: string): Promise<WorkshopClassSubDataReturn>;
+    getDetailedSubclass(subclassId: number, accountId: string): Promise<WorkshopClassSubDetailDataReturn>;
     createSubclass(data: CreateClassSubPayload, accountId: string): Promise<WorkshopClassSubDataReturn>;
     editSubclass(data: UpdateClassSubPayload, accountId: string): Promise<WorkshopClassSubDataReturn>;
-    deleteSubclass(subclassId: number, workshopClassId: number, accountId: string): Promise<void>;
+    deleteSubclass(subclassId: number, accountId: string): Promise<void>;
 }
 
 export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
@@ -270,10 +270,21 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
             const imageKey = await this.fileService.moveTempFileToFinalLocation(data.resource.image, destKey);
 
             data.resource.image = imageKey;
-        }
 
-        if (existingResource.image) {
-            await this.fileService.deleteFile(existingResource.image);
+            // Delete old image if it exists and we have a new one
+            if (existingResource.image) {
+                await this.fileService.deleteFile(existingResource.image);
+            }
+        } else if (data.resource.image === "") {
+            // Explicitly clear image from storage if user removed it
+            if (existingResource.image) {
+                await this.fileService.deleteFile(existingResource.image);
+            }
+        } else if (data.resource.image) {
+            const imageBaseUrl = process.env.FILE_PUBLIC_URL || "";
+            if (imageBaseUrl && data.resource.image.startsWith(imageBaseUrl + "/")) {
+                data.resource.image = data.resource.image.replace(imageBaseUrl + "/", "");
+            }
         }
 
         return await this.classService.editResource(data, accountId);
@@ -294,14 +305,14 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
         return await this.classService.getSubclasses(workshopClassId, accountId);
     }
 
-    async getOneSubclass(subclassId: number, workshopClassId: number, accountId: string): Promise<WorkshopClassSubDataReturn> {
-        return await this.classService.getOneSubclass(subclassId, workshopClassId, accountId);
+    async getOneSubclass(subclassId: number, accountId: string): Promise<WorkshopClassSubDataReturn> {
+        return await this.classService.getOneSubclass(subclassId, accountId);
     }
 
-    async getDetailedSubclass(subclassId: number, workshopClassId: number, accountId: string): Promise<WorkshopClassSubDetailDataReturn> {
-        const subclassData = await this.classService.getOneSubclass(subclassId, workshopClassId, accountId);
-        const resources = await this.classService.getSubclassResources(subclassId);
-        const spellIds = await this.classService.getSubclassSpellIds(subclassId);
+    async getDetailedSubclass(subclassId: number, accountId: string): Promise<WorkshopClassSubDetailDataReturn> {
+        const subclassData = await this.classService.getOneSubclass(subclassId, accountId);
+        const resources = await this.classService.getSubclassResources(subclassId, accountId);
+        const spellIds = await this.classService.getSubclassSpellIds(subclassId, accountId);
 
         const spells = await this.spellService.getSpellsByIds(spellIds, accountId);
 
@@ -331,7 +342,7 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
             // 3. Process resources if any
             let resourceImagesToUpdate: { id: number, image: string }[] = [];
             if (data.resources && data.resources.length > 0) {
-                const createdResources = await this.classService.createSubclassResources(data.resources, accountId, newSubclass.id, transaction);
+                const createdResources = await this.classService.createSubclassResources(data.resources, newSubclass.id, transaction);
 
                 // Formulate bulk image move payload
                 const filesToMove: { sourceKey: string, destinationKey: string, resourceId: number }[] = [];
@@ -340,12 +351,22 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
                     const reqResource = data.resources[i]!;
                     const newResource = createdResources[i]!;
 
-                    if (reqResource.image) {
+                    if (reqResource.image && reqResource.image.startsWith("user/temp/")) {
                         const destKey = `user/uploads/workshop/class_sub_resources/${newResource.id}-${accountId}-${Date.now()}-${i}`;
                         filesToMove.push({
                             sourceKey: reqResource.image,
                             destinationKey: destKey,
                             resourceId: newResource.id,
+                        });
+                    } else if (reqResource.image) {
+                        let imageKeyToSave = reqResource.image;
+                        const imageBaseUrl = process.env.FILE_PUBLIC_URL || "";
+                        if (imageBaseUrl && imageKeyToSave.startsWith(imageBaseUrl + "/")) {
+                            imageKeyToSave = imageKeyToSave.replace(imageBaseUrl + "/", "");
+                        }
+                        resourceImagesToUpdate.push({
+                            id: newResource.id,
+                            image: imageKeyToSave,
                         });
                     }
                 }
@@ -384,26 +405,26 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
         const transaction = await sequelize.transaction();
 
         try {
-            const targetSubclass = await this.classService.getOneSubclass(data.id, data.workshopClassId, accountId, true);
-            const targetResources = await this.classService.getSubclassResources(data.id, true);
+            const targetSubclass = await this.classService.getOneSubclass(data.id, accountId, true);
+            const targetResources = await this.classService.getSubclassResources(data.id, accountId, true);
 
             const updatedSubclass = await this.classService.editSubclass(data, accountId, transaction);
 
             // Spells
-            await this.classService.deleteSubclassSpells(updatedSubclass.id, transaction);
+            await this.classService.deleteSubclassSpells(updatedSubclass.id, accountId, transaction);
             if (data.spellIds && data.spellIds.length > 0 && data.spellcastingProperties) {
                 await this.spellService.getSpellsByIds(data.spellIds, accountId);
                 await this.classService.createSubclassSpell(data.spellIds, updatedSubclass.id, transaction);
             }
 
             // Resources
-            await this.classService.deleteSubclassResources(updatedSubclass.id, transaction);
+            await this.classService.deleteSubclassResources(updatedSubclass.id, accountId, transaction);
 
             let resourceImagesToUpdate: { id: number, image: string }[] = [];
             const currentResourceImages: string[] = [];
 
             if (data.resources && data.resources.length > 0) {
-                const createdResources = await this.classService.createSubclassResources(data.resources, accountId, updatedSubclass.id, transaction);
+                const createdResources = await this.classService.createSubclassResources(data.resources, updatedSubclass.id, transaction);
 
                 const filesToMove: { sourceKey: string, destinationKey: string, resourceId: number }[] = [];
 
@@ -469,7 +490,7 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
             }
             await this.classService.updateSubclassResourcesImageBulk(resourceImagesToUpdate);
 
-            return await this.getOneSubclass(updatedSubclass.id, data.workshopClassId, accountId);
+            return await this.getOneSubclass(updatedSubclass.id, accountId);
 
         } catch (error) {
             await transaction.rollback();
@@ -477,9 +498,9 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
         }
     }
 
-    async deleteSubclass(subclassId: number, workshopClassId: number, accountId: string): Promise<void> {
-        const targetSubclass = await this.classService.getOneSubclass(subclassId, workshopClassId, accountId, true);
-        const targetResources = await this.classService.getSubclassResources(subclassId, true);
+    async deleteSubclass(subclassId: number, accountId: string): Promise<void> {
+        const targetSubclass = await this.classService.getOneSubclass(subclassId, accountId, true);
+        const targetResources = await this.classService.getSubclassResources(subclassId, accountId, true);
 
         // Delete subclass image
         await this.fileService.deleteFile(targetSubclass.image ?? "");
@@ -490,6 +511,6 @@ export class WorkshopClassOrchestration implements IWorkshopClassOrchestration {
             await this.fileService.deleteFilesBulk(resourceImagesToDelete as string[]);
         }
 
-        await this.classService.deleteSubclass(subclassId, workshopClassId, accountId);
+        await this.classService.deleteSubclass(subclassId, accountId);
     }
 }

@@ -112,7 +112,6 @@ export const CreateWorkshopClassSubSchema = z.object({
 
 export const UpdateWorkshopClassSubSchema = z.object({
     id: z.number().int().positive(),
-    workshopClassId: z.number().int().positive(),
     isImageUpdated: z.boolean(),
     image: z.string().nullable().optional(),
     name: z.string().min(1).max(100),

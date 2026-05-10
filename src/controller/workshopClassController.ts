@@ -418,17 +418,7 @@ class WorkshopClassController {
     static async getOneSubclass(req: Request, res: Response) {
         try {
             const accountId = req.user?.accountId || "";
-            const parentClassId = Number(req.query.parentClassId);
-
-            if (!parentClassId) {
-                return res.status(400).json({
-                    "status": "failed",
-                    "message": "Missing parentClassId query parameter",
-                    "userMessage": "Missing parentClassId",
-                });
-            }
-
-            const data = await classOrchestration.getOneSubclass(Number(req.params.id), parentClassId, accountId);
+            const data = await classOrchestration.getOneSubclass(Number(req.params.id), accountId);
 
             return res.status(200).json({
                 "status": "success",
@@ -458,17 +448,7 @@ class WorkshopClassController {
     static async getDetailedSubclass(req: Request, res: Response) {
         try {
             const accountId = req.user?.accountId || "";
-            const parentClassId = Number(req.query.parentClassId);
-
-            if (!parentClassId) {
-                return res.status(400).json({
-                    "status": "failed",
-                    "message": "Missing parentClassId query parameter",
-                    "userMessage": "Missing parentClassId",
-                });
-            }
-
-            const data = await classOrchestration.getDetailedSubclass(Number(req.params.id), parentClassId, accountId);
+            const data = await classOrchestration.getDetailedSubclass(Number(req.params.id), accountId);
 
             return res.status(200).json({
                 "status": "success",
@@ -574,17 +554,7 @@ class WorkshopClassController {
     static async deleteSubclass(req: Request, res: Response) {
         try {
             const accountId = req.user?.accountId || "";
-            const parentClassId = Number(req.query.parentClassId);
-
-            if (!parentClassId) {
-                return res.status(400).json({
-                    "status": "failed",
-                    "message": "Missing parentClassId query parameter",
-                    "userMessage": "Missing parentClassId",
-                });
-            }
-
-            await classOrchestration.deleteSubclass(Number(req.params.id), parentClassId, accountId);
+            await classOrchestration.deleteSubclass(Number(req.params.id), accountId);
 
             return res.status(200).json({
                 "status": "success",

@@ -31,16 +31,16 @@ export interface IWorkshopClassService {
     deleteResource(data: DeleteResourcePayload, accountId: string): Promise<ClassResourceReturn>;
     getOneResource(resourceId: number, workshopClassId: number, accountId: string): Promise<WorkshopClassResourceDataReturn>;
     getSubclasses(workshopClassId: number, accountId: string): Promise<WorkshopClassSubDataReturn[]>;
-    getOneSubclass(subclassId: number, workshopClassId: number, accountId: string, imageKeyOnly?: boolean): Promise<WorkshopClassSubDataReturn>;
-    getSubclassResources(subclassId: number, imageKeyOnly?: boolean): Promise<WorkshopClassSubResourceDataReturn[]>;
-    getSubclassSpellIds(subclassId: number): Promise<number[]>;
+    getOneSubclass(subclassId: number, accountId: string, imageKeyOnly?: boolean): Promise<WorkshopClassSubDataReturn>;
+    getSubclassResources(subclassId: number, accountId: string, imageKeyOnly?: boolean): Promise<WorkshopClassSubResourceDataReturn[]>;
+    getSubclassSpellIds(subclassId: number, accountId: string): Promise<number[]>;
     createSubclass(data: CreateClassSubDTO, accountId: string, transaction?: Transaction): Promise<WorkshopClassSubDataReturn>;
-    createSubclassResources(data: ClassResourceDTO[], accountId: string, subclassId: number, transaction?: Transaction): Promise<WorkshopClassSubResourceDataReturn[]>;
+    createSubclassResources(data: ClassResourceDTO[], subclassId: number, transaction?: Transaction): Promise<WorkshopClassSubResourceDataReturn[]>;
     createSubclassSpell(spellIds: number[], subclassId: number, transaction?: Transaction): Promise<void>;
     editSubclass(data: UpdateClassSubDTO, accountId: string, transaction?: Transaction): Promise<WorkshopClassSubDataReturn>;
-    deleteSubclassResources(subclassId: number, transaction?: Transaction): Promise<void>;
-    deleteSubclassSpells(subclassId: number, transaction?: Transaction): Promise<void>;
-    deleteSubclass(subclassId: number, workshopClassId: number, accountId: string, transaction?: Transaction): Promise<void>;
+    deleteSubclassResources(subclassId: number, accountId: string, transaction?: Transaction): Promise<void>;
+    deleteSubclassSpells(subclassId: number, accountId: string, transaction?: Transaction): Promise<void>;
+    deleteSubclass(subclassId: number, accountId: string, transaction?: Transaction): Promise<void>;
     updateSubclassImage(subclassId: number, accountId: string, image: string): Promise<void>;
     updateSubclassResourcesImageBulk(resourcesImageKeys: { id: number, image: string }[]): Promise<void>;
 }
@@ -568,19 +568,14 @@ export class WorkshopClassService implements IWorkshopClassService {
         }));
     }
 
-    async getOneSubclass(subclassId: number, workshopClassId: number, accountId: string, imageKeyOnly?: boolean): Promise<WorkshopClassSubDataReturn> {
-        await this.getOneClass(workshopClassId, accountId); // validate class access
-
-        const c = await WorkshopClassSub.findOne({
-            where: {
-                id: subclassId,
-                workshop_class_id: workshopClassId
-            }
-        });
+    async getOneSubclass(subclassId: number, accountId: string, imageKeyOnly?: boolean): Promise<WorkshopClassSubDataReturn> {
+        const c = await WorkshopClassSub.findByPk(subclassId);
 
         if (!c) {
             throw new DataNotFound("CLASS001");
         }
+
+        await this.getOneClass(c.workshop_class_id, accountId); // validate class access
 
         const imageBaseUrl = process.env.FILE_PUBLIC_URL || "";
         const image = imageKeyOnly ? c.image : c.image ? `${imageBaseUrl}/${c.image}` : "";
@@ -597,7 +592,11 @@ export class WorkshopClassService implements IWorkshopClassService {
         };
     }
 
-    async getSubclassResources(subclassId: number, imageKeyOnly?: boolean): Promise<WorkshopClassSubResourceDataReturn[]> {
+    async getSubclassResources(subclassId: number, accountId: string, imageKeyOnly?: boolean): Promise<WorkshopClassSubResourceDataReturn[]> {
+        const subclass = await WorkshopClassSub.findByPk(subclassId);
+        if (!subclass) throw new DataNotFound("CLASS001");
+        await this.getOneClass(subclass.workshop_class_id, accountId);
+
         const resources = await WorkshopClassSubResources.findAll({
             where: { workshop_class_sub_id: subclassId }
         });
@@ -617,7 +616,11 @@ export class WorkshopClassService implements IWorkshopClassService {
         }));
     }
 
-    async getSubclassSpellIds(subclassId: number): Promise<number[]> {
+    async getSubclassSpellIds(subclassId: number, accountId: string): Promise<number[]> {
+        const subclass = await WorkshopClassSub.findByPk(subclassId);
+        if (!subclass) throw new DataNotFound("CLASS001");
+        await this.getOneClass(subclass.workshop_class_id, accountId);
+
         const spells = await WorkshopClassSubSpell.findAll({
             where: { workshop_class_sub_id: subclassId }
         });
@@ -649,7 +652,7 @@ export class WorkshopClassService implements IWorkshopClassService {
         };
     }
 
-    async createSubclassResources(data: ClassResourceDTO[], accountId: string, subclassId: number, transaction?: Transaction): Promise<WorkshopClassSubResourceDataReturn[]> {
+    async createSubclassResources(data: ClassResourceDTO[], subclassId: number, transaction?: Transaction): Promise<WorkshopClassSubResourceDataReturn[]> {
         const resourcesToCreate = data.map(resource => ({
             workshop_class_sub_id: subclassId,
             image: "",
@@ -686,18 +689,13 @@ export class WorkshopClassService implements IWorkshopClassService {
     }
 
     async editSubclass(data: UpdateClassSubDTO, accountId: string, transaction?: Transaction): Promise<WorkshopClassSubDataReturn> {
-        await this.getOneClass(data.workshopClassId, accountId); // validate class access
-
-        const subclass = await WorkshopClassSub.findOne({
-            where: {
-                id: data.id,
-                workshop_class_id: data.workshopClassId,
-            }
-        });
+        const subclass = await WorkshopClassSub.findByPk(data.id);
 
         if (!subclass) {
             throw new DataNotFound("CLASS001");
         }
+
+        await this.getOneClass(subclass.workshop_class_id, accountId); // validate class access
 
         await subclass.update({
             image: data.isImageUpdated ? data.image : subclass.image,
@@ -719,33 +717,36 @@ export class WorkshopClassService implements IWorkshopClassService {
         };
     }
 
-    async deleteSubclassResources(subclassId: number, transaction?: Transaction): Promise<void> {
+    async deleteSubclassResources(subclassId: number, accountId: string, transaction?: Transaction): Promise<void> {
+        const subclass = await WorkshopClassSub.findByPk(subclassId);
+        if (!subclass) throw new DataNotFound("CLASS001");
+        await this.getOneClass(subclass.workshop_class_id, accountId);
+
         await WorkshopClassSubResources.destroy({
             where: { workshop_class_sub_id: subclassId },
             transaction: transaction ?? null
         });
     }
 
-    async deleteSubclassSpells(subclassId: number, transaction?: Transaction): Promise<void> {
+    async deleteSubclassSpells(subclassId: number, accountId: string, transaction?: Transaction): Promise<void> {
+        const subclass = await WorkshopClassSub.findByPk(subclassId);
+        if (!subclass) throw new DataNotFound("CLASS001");
+        await this.getOneClass(subclass.workshop_class_id, accountId);
+
         await WorkshopClassSubSpell.destroy({
             where: { workshop_class_sub_id: subclassId },
             transaction: transaction ?? null
         });
     }
 
-    async deleteSubclass(subclassId: number, workshopClassId: number, accountId: string, transaction?: Transaction): Promise<void> {
-        await this.getOneClass(workshopClassId, accountId); // validate class access
-
-        const subclass = await WorkshopClassSub.findOne({
-            where: {
-                id: subclassId,
-                workshop_class_id: workshopClassId,
-            }
-        });
+    async deleteSubclass(subclassId: number, accountId: string, transaction?: Transaction): Promise<void> {
+        const subclass = await WorkshopClassSub.findByPk(subclassId);
 
         if (!subclass) {
             throw new DataNotFound("CLASS001");
         }
+
+        await this.getOneClass(subclass.workshop_class_id, accountId); // validate class access
 
         await subclass.destroy({ transaction: transaction ?? null });
     }
