@@ -10,6 +10,7 @@ import { WorkshopMonsterOrchestration } from "@/orchestration/workshopMonsterOrc
 import { ReferenceOrchestration } from "@/orchestration/referenceOrchestration";
 import { FileOrchestration } from "@/orchestration/fileOrchestration";
 import { WorkshopClassOrchestration } from "@/orchestration/workshopClassOrchestration";
+import { WorkshopRaceOrchestration } from "@/orchestration/workshopRaceOrchestration";
 
 // services
 import {
@@ -24,6 +25,7 @@ import {
     referenceService,
     fileService,
     workshopClassService,
+    workshopRaceService,
 } from "@/services";
 
 // providers
@@ -75,6 +77,11 @@ export const monsterOrchestration = new WorkshopMonsterOrchestration(
 );
 export const classOrchestration = new WorkshopClassOrchestration(
     workshopClassService,
+    workshopSpellService,
+    fileService
+);
+export const raceOrchestration = new WorkshopRaceOrchestration(
+    workshopRaceService,
     workshopSpellService,
     fileService
 );

@@ -34,7 +34,7 @@ WorkshopClassResources.init({
         onDelete: 'CASCADE'
     },
     image: {
-        type: DataTypes.STRING(255),
+        type: DataTypes.STRING(100),
         allowNull: true,
     },
     name: {

@@ -10,6 +10,7 @@ import { WorkshopMonsterService } from "@/services/workshopMonsterService";
 import { ReferenceService } from "@/services/referenceService";
 import { FileService } from "@/services/fileService";
 import { WorkshopClassService } from "@/services/workshopClassService";
+import { WorkshopRaceService } from "@/services/workshopRaceService";
 
 // providers
 import {
@@ -45,3 +46,4 @@ export const referenceService = new ReferenceService();
 export const fileService = new FileService(cloudflareR2StorageProvider);
 export const workshopMonsterService = new WorkshopMonsterService();
 export const workshopClassService = new WorkshopClassService();
+export const workshopRaceService = new WorkshopRaceService();

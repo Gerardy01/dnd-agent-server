@@ -66,7 +66,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
 }
 export const apiRateLimiter = rateLimit({
     windowMs: 1000, // 1 second
-    limit: 20, // limit each IP to 20 requests per second
+    limit: 30, // limit each IP to 30 requests per second
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     message: {

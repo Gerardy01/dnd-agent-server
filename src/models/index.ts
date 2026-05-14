@@ -12,6 +12,8 @@ import WorkshopClassResources from "@/models/workshopClass/workshopClassResource
 import WorkshopClassSubResources from "@/models/workshopClass/workshopClassSubResources.model";
 import WorkshopClassSpell from "@/models/workshopClass/workshopClassSpell.model";
 import WorkshopClassSubSpell from "@/models/workshopClass/workshopClassSubSpell.model";
+import WorkshopRace from "@/models/workshopRace/workshopRace.model";
+import WorkshopRaceSpell from "@/models/workshopRace/workshopRaceSpell.model";
 
 export {
     Account,
@@ -28,4 +30,6 @@ export {
     WorkshopClassSubResources,
     WorkshopClassSpell,
     WorkshopClassSubSpell,
+    WorkshopRace,
+    WorkshopRaceSpell,
 }
